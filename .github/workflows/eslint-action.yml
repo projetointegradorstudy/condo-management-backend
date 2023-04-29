@@ -1,0 +1,21 @@
+name: EsLint Code Verifyer
+
+on: ['pull_request']
+
+jobs:
+  ESLINT:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checking repository
+        uses: actions/checkout@v3
+
+      - name: Installing Node 16v
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Installing the dependencies from package.json
+        run: npm i
+
+      - name: Running eslint to code verify
+        run: npm run lint
