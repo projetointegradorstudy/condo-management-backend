@@ -39,7 +39,7 @@ export class UserService {
 
   async remove(uuid: string) {
     const user = await this.findOne(uuid);
-    await this.userRepository.delete(uuid);
+    await this.userRepository.delete(user.id);
     return { message: 'User deleted successfully' };
   }
 }
