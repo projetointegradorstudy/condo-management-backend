@@ -31,6 +31,14 @@
 ```bash
 $ npm install
 ```
+- Make a copy of the file .env.example
+- Rename the copy to .env
+
+## Running the containerized database
+
+```bash
+docker compose up -d
+```
 
 ## Running the app
 
