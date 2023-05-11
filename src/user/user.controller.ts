@@ -1,10 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { Role } from 'src/auth/roles/role.enum';
 
-@Controller('user')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -13,12 +18,12 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @Get('find-all')
+  @Get('')
   findAll() {
     return this.userService.findAll();
   }
 
-  @Get('find-one/:uuid')
+  @Get(':uuid')
   findOne(@Param('uuid', ParseUUIDPipe) uuid: string) {
     return this.userService.findOne(uuid);
   }
@@ -29,6 +34,7 @@ export class UserController {
   }
 
   @Patch('admin/:uuid/update')
+  @Roles(Role.ADMIN)
   updateByAdmin(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() adminUpdateUserDto: AdminUpdateUserDto) {
     return this.userService.updateByAdmin(uuid, adminUpdateUserDto);
   }

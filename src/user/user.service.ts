@@ -27,9 +27,19 @@ export class UserService {
     return user;
   }
 
+  async findToLogin(username: string) {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where(`user.username = '${username}'`)
+      .addSelect('user.password')
+      .getOne();
+    return user;
+  }
+
   async update(uuid: string, updateUserDto: UpdateUserDto) {
     const user = await this.findOne(uuid);
-    await this.userRepository.update({ id: user.id }, updateUserDto);
+    const updatedUser = this.userRepository.create(updateUserDto);
+    await this.userRepository.update({ id: user.id }, updatedUser);
     return await this.findOne(uuid);
   }
 
