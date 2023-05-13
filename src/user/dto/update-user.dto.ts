@@ -5,15 +5,15 @@ export class UpdateUserDto {
   @ApiProperty({ example: 'John Doo' })
   @IsString()
   @IsOptional()
-  name: string;
+  name?: string;
 
   @ApiProperty()
   @IsString()
   @IsOptional()
-  password: string;
+  password?: string;
 
   @ApiProperty()
   @IsString()
   @IsOptional()
-  passwordConfirmation: string;
+  passwordConfirmation?: string;
 }

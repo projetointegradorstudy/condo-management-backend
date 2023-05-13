@@ -11,11 +11,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
-
-export enum Role {
-  USER = 'user',
-  ADMIN = 'admin',
-}
+import { Role } from 'src/auth/roles/role.enum';
 
 @Entity()
 export class User extends BaseEntity {
