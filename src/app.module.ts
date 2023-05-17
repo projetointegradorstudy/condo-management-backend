@@ -6,6 +6,7 @@ import { validate } from './config/env.validation';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { EnvironmentsModule } from './environments/environments.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UserModule,
     AuthModule,
+    EnvironmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
