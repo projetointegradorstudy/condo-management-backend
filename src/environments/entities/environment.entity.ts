@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Entity, IsNull } from "typeorm";
+import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Entity } from "typeorm";
 import { Status } from "./status.enum";
 
 @Entity({name: 'environments'})
