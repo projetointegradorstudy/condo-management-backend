@@ -3,8 +3,9 @@ import { Repository } from 'typeorm';
 import { Environment } from './entities/environment.entity';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
+import { IEnvironmentRepository } from './interfaces/environments.repository';
 
-export class EnvironmentRepository extends Repository<Environment> {
+export class EnvironmentRepository extends Repository<Environment> implements IEnvironmentRepository {
     constructor(
         @InjectRepository(Environment)
         private environmentRepository: Repository<Environment>
