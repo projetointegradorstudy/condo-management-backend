@@ -19,7 +19,7 @@ import { EnvironmentsModule } from './environments/environments.module';
         username: 'admin',
         password: '123456',
         database: 'condo-project',
-        entities: [__dirname + '../**/*.entity{.ts,.js}'],
+        entities: ['dist/**/*.entity{.ts,.js}'],
         synchronize: true,
         autoLoadEntities: true,
       }),
