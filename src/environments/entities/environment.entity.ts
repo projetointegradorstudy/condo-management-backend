@@ -18,7 +18,7 @@ export class Environment {
   
     @ApiProperty({ example: 'https://aws.test' })
     @Column()
-    image: string;
+    image?: string;
   
     @ApiProperty()
     @CreateDateColumn()
