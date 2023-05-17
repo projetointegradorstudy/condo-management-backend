@@ -7,16 +7,18 @@ import { EnvironmentRepository } from './environments.repository';
 import { IEnvironmentRepository } from './interfaces/environments.repository';
 import { IEnvironmentService } from './interfaces/environments.service';
 
-
 @Module({
   imports: [TypeOrmModule.forFeature([Environment])],
   controllers: [EnvironmentsController],
-  providers: [{
-    provide: IEnvironmentService,
-    useClass: EnvironmentsService
-  },{
-    provide: IEnvironmentRepository,
-    useClass: EnvironmentRepository
-  }]
+  providers: [
+    {
+      provide: IEnvironmentService,
+      useClass: EnvironmentsService,
+    },
+    {
+      provide: IEnvironmentRepository,
+      useClass: EnvironmentRepository,
+    },
+  ],
 })
 export class EnvironmentsModule {}

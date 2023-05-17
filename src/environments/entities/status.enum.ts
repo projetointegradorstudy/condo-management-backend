@@ -1,5 +1,4 @@
 export enum Status {
-    AVAILABLE = 'available',
-    LOCKED = 'locked',
-  }
-  
+  AVAILABLE = 'available',
+  LOCKED = 'locked',
+}

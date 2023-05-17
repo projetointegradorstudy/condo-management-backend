@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,ParseUUIDPipe, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Inject } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { IEnvironmentService } from './interfaces/environments.service';
@@ -28,7 +28,7 @@ export class EnvironmentsController {
   }
 
   @Delete(':uuid')
-  remove(@Param('uuid',ParseUUIDPipe) uuid: string) {
+  remove(@Param('uuid', ParseUUIDPipe) uuid: string) {
     return this.environmentsService.remove(uuid);
   }
 }
