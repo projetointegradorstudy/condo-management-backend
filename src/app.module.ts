@@ -21,7 +21,6 @@ import { EnvironmentsModule } from './environments/environments.module';
         database: 'condo-project',
         entities: ['dist/**/*.entity{.ts,.js}'],
         synchronize: true,
-        autoLoadEntities: true,
       }),
     }),
     UserModule,
