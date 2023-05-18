@@ -2,11 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
-import { UserRepository } from './user.repository';
+import { UsersRepository } from './users.repository';
+import { IUserService } from './interfaces/users.service';
 
 @Injectable()
-export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+export class UsersService implements IUserService {
+  constructor(private readonly userRepository: UsersRepository) {}
 
   async create(createUserDto: CreateUserDto) {
     return await this.userRepository.createUser(createUserDto);
@@ -32,7 +33,8 @@ export class UserService {
   }
 
   async updateByAdmin(id: string, adminUpdateUserDto: AdminUpdateUserDto) {
-    return `This action updates a #${id} user`;
+    const user = await this.findOne(id);
+    return await this.userRepository.updateUser(user.id, adminUpdateUserDto);
   }
 
   async remove(id: string) {
