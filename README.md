@@ -26,6 +26,10 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## API Documentation
+
+It can be accessed through the endpoint `http://{your_host}:{your_port}/api/v1/docs/`
+
 ## Installation
 
 ```bash
@@ -36,8 +40,14 @@ $ npm install
 
 ## Running the containerized database
 
+- Start containers
 ```bash
 docker compose up -d
+```
+
+- Kill containers
+```bash
+docker compose down
 ```
 
 ## Running the app
