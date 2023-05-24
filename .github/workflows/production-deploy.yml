@@ -46,6 +46,6 @@ jobs:
           target: production
           push: true
           tags: |
-            ghcr.io/infinit-pix/infinit-backend:v1.0.${{github.run_number}}
+            ghcr.io/projetointegradorstudy/condo-management-backend:v1.0.${{github.run_number}}
             ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
