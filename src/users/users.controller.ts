@@ -9,7 +9,7 @@ import { Roles } from 'src/auth/roles/roles.decorator';
 import { Role } from 'src/auth/roles/role.enum';
 import { ApiTags } from '@nestjs/swagger';
 
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
