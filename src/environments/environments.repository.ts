@@ -4,6 +4,7 @@ import { Environment } from './entities/environment.entity';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { IEnvironmentRepository } from './interfaces/environments.repository';
+import { Status } from './entities/status.enum';
 
 export class EnvironmentRepository extends Repository<Environment> implements IEnvironmentRepository {
   constructor(
@@ -19,6 +20,14 @@ export class EnvironmentRepository extends Repository<Environment> implements IE
 
   async findById(id: string): Promise<Environment> {
     return await this.environmentRepository.findOne({ where: { id: id } });
+  }
+
+  async findEnvironments(status: Status): Promise<Environment[]> {
+    if (status) {
+      return await this.environmentRepository.find({ where: { status: status } });
+    }
+
+    return await this.environmentRepository.find();
   }
 
   async updateEnvironment(id: string, updateEnvironmentDto: UpdateEnvironmentDto): Promise<Environment> {
