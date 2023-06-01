@@ -7,9 +7,10 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { Roles } from 'src/auth/roles/roles.decorator';
 import { Role } from 'src/auth/roles/role.enum';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
+@ApiBearerAuth()
 @ApiTags('Users')
 @Controller('users')
 export class UserController {
