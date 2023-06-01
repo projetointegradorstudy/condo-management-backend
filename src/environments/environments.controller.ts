@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Inject, Query } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { IEnvironmentService } from './interfaces/environments.service';
@@ -15,8 +15,8 @@ export class EnvironmentsController {
   }
 
   @Get()
-  findAll() {
-    return this.environmentsService.findAll();
+  findAll(@Query('status') status?: string) {
+    return this.environmentsService.findAll(status);
   }
 
   @Get(':uuid')
@@ -27,6 +27,21 @@ export class EnvironmentsController {
   @Patch(':uuid')
   update(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() updateEnvironmentDto: UpdateEnvironmentDto) {
     return this.environmentsService.update(uuid, updateEnvironmentDto);
+  }
+
+  @Patch(':uuid/request')
+  request(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() updateEnvironmentDto: UpdateEnvironmentDto) {
+    return this.environmentsService.request(uuid, updateEnvironmentDto);
+  }
+
+  @Patch(':uuid/approve')
+  approve(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() updateEnvironmentDto: UpdateEnvironmentDto) {
+    return this.environmentsService.approve(uuid, updateEnvironmentDto);
+  }
+
+  @Patch(':uuid/release')
+  release(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() updateEnvironmentDto: UpdateEnvironmentDto) {
+    return this.environmentsService.release(uuid, updateEnvironmentDto);
   }
 
   @Delete(':uuid')
