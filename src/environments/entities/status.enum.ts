@@ -26,7 +26,7 @@ export function isComplianceStatus(receivedStatus: string, environmentStatus: st
       break;
 
     case Status.AVAILABLE:
-      if (environmentStatus !== Status.LOCKED) {
+      if (environmentStatus !== Status.LOCKED && environmentStatus !== Status.PENDING) {
         return 'environment is not ready to release';
       }
       break;
