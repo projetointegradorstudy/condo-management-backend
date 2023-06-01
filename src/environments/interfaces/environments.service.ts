@@ -6,9 +6,6 @@ export interface IEnvironmentService {
   findAll(status: string): Promise<Environment[]>;
   findOne(id: string): Promise<Environment>;
   update(id: string, updateEnvironmentDto: UpdateEnvironmentDto): Promise<Environment>;
-  request(id: string, updateEnvironmentDto: UpdateEnvironmentDto): Promise<Environment>;
-  approve(id: string, updateEnvironmentDto: UpdateEnvironmentDto): Promise<Environment>;
-  release(id: string, updateEnvironmentDto: UpdateEnvironmentDto): Promise<Environment>;
   create(createEnvironmentDto: CreateEnvironmentDto): Promise<Environment>;
   remove(id: string): Promise<any>;
 }

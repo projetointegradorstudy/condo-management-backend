@@ -118,29 +118,33 @@ describe('EnvironmentsService', () => {
       await expect(environmentsService.findOne(id)).rejects.toThrowError(NotFoundException);
     });
   });
-
   describe('update', () => {
-    it('should update and return an existing environment', async () => {
-      const id = '12345';
-
-      const updateEnvironmentDto: Environment = {
-        id: '12345',
+    it('should update an environment', async () => {
+      const id = '123';
+      const existingEnvironment: Environment = {
+        id: '123',
         name: 'Env Test',
         status: Status.AVAILABLE,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
       };
+      const updateEnvironmentDto: UpdateEnvironmentDto = {
+        name: 'Env Test',
+        status: Status.PENDING,
+        capacity: 4,
+      };
+
       const updatedEnvironment: Environment = {
-        id: '12345',
+        id: '123',
         name: 'Env Test',
-        status: Status.AVAILABLE,
+        status: Status.PENDING,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.findById.mockResolvedValue(updatedEnvironment);
+      mockEnvironmentRepository.findById.mockResolvedValue(existingEnvironment);
       mockEnvironmentRepository.updateEnvironment.mockResolvedValue(updatedEnvironment);
 
       const result = await environmentsService.update(id, updateEnvironmentDto);
@@ -150,21 +154,42 @@ describe('EnvironmentsService', () => {
       expect(result).toEqual(updatedEnvironment);
     });
 
-    it('should throw NotFoundException when environment is not found', async () => {
-      const id = '12345';
-
-      const updateEnvironmentDto: Environment = {
-        id: '12345',
+    it('should throw NotFoundException if environment is not found', async () => {
+      const id = '123';
+      const updateEnvironmentDto: UpdateEnvironmentDto = {
         name: 'Env Test',
         status: Status.AVAILABLE,
+        capacity: 4,
+      };
+
+      mockEnvironmentRepository.findById.mockResolvedValue(null);
+
+      await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
+      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
+      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
+    });
+
+    it('should throw BadRequestException for non-compliant status', async () => {
+      const id = '123';
+      const updateEnvironmentDto: UpdateEnvironmentDto = {
+        name: 'Env Test',
+        status: Status.PENDING,
+        capacity: 4,
+      };
+      const existingEnvironment: Environment = {
+        id: '12345',
+        name: 'Env Test',
+        status: Status.LOCKED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.findById.mockResolvedValue(undefined);
+      mockEnvironmentRepository.findById.mockResolvedValue(existingEnvironment);
 
-      await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
+      await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(BadRequestException);
+      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
+      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
     });
   });
 
@@ -196,186 +221,6 @@ describe('EnvironmentsService', () => {
       mockEnvironmentRepository.findById.mockResolvedValue(undefined);
 
       await expect(environmentsService.remove(id)).rejects.toThrowError(NotFoundException);
-    });
-  });
-  describe('request', () => {
-    it('should call environmentRepository.findById and environmentRepository.updateEnvironment, and return the updated environment', async () => {
-      const id = '1';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {};
-
-      const environment: Environment = {
-        id,
-        name: 'Test Environment',
-        status: Status.AVAILABLE,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-      const updatedEnvironment: Environment = { ...environment, ...updateEnvironmentDto };
-
-      mockEnvironmentRepository.findById.mockResolvedValue(environment);
-      mockEnvironmentRepository.updateEnvironment.mockResolvedValue(updatedEnvironment);
-
-      const result = await environmentsService.request(id, updateEnvironmentDto);
-
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).toHaveBeenCalledWith(id, updateEnvironmentDto);
-      expect(result).toEqual(updatedEnvironment);
-    });
-
-    it('should throw NotFoundException when environment is not found', async () => {
-      const id = '1';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {};
-
-      mockEnvironmentRepository.findById.mockResolvedValue(undefined);
-
-      await expect(environmentsService.request(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
-    });
-
-    it('should throw BadRequestException when environment status is LOCKED or PENDING', async () => {
-      const id = '1';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {};
-
-      const environment: Environment = {
-        id,
-        name: 'Test Environment',
-        status: Status.LOCKED,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-
-      mockEnvironmentRepository.findById.mockResolvedValue(environment);
-
-      await expect(environmentsService.request(id, updateEnvironmentDto)).rejects.toThrowError(BadRequestException);
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
-    });
-  });
-  describe('release', () => {
-    it('should call environmentRepository.findById and environmentRepository.updateEnvironment, and return the updated environment', async () => {
-      const id = '1';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {};
-
-      const environment: Environment = {
-        id,
-        name: 'Test Environment',
-        status: Status.LOCKED,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-      const updatedEnvironment: Environment = { ...environment, ...updateEnvironmentDto };
-
-      mockEnvironmentRepository.findById.mockResolvedValue(environment);
-      mockEnvironmentRepository.updateEnvironment.mockResolvedValue(updatedEnvironment);
-
-      const result = await environmentsService.release(id, updateEnvironmentDto);
-
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).toHaveBeenCalledWith(id, updateEnvironmentDto);
-      expect(result).toEqual(updatedEnvironment);
-    });
-
-    it('should throw NotFoundException when environment is not found', async () => {
-      const id = '1';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {};
-
-      mockEnvironmentRepository.findById.mockResolvedValue(undefined);
-
-      await expect(environmentsService.release(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
-    });
-
-    it('should throw BadRequestException when environment status is not LOCKED', async () => {
-      const id = '1';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {
-        name: 'Updated Environment',
-        status: Status.AVAILABLE,
-      };
-
-      const environment: Environment = {
-        id,
-        name: 'Test Environment',
-        status: Status.PENDING,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-
-      mockEnvironmentRepository.findById.mockResolvedValue(environment);
-
-      await expect(environmentsService.release(id, updateEnvironmentDto)).rejects.toThrowError(BadRequestException);
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
-    });
-  });
-  describe('approve', () => {
-    it('should call environmentRepository.findById and environmentRepository.updateEnvironment, and return the updated environment', async () => {
-      const id = '1';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {
-        name: 'Updated Environment',
-        status: Status.LOCKED,
-      };
-
-      const environment: Environment = {
-        id,
-        name: 'Test Environment',
-        status: Status.PENDING,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-      const updatedEnvironment: Environment = { ...environment, ...updateEnvironmentDto };
-
-      mockEnvironmentRepository.findById.mockResolvedValue(environment);
-      mockEnvironmentRepository.updateEnvironment.mockResolvedValue(updatedEnvironment);
-
-      const result = await environmentsService.approve(id, updateEnvironmentDto);
-
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).toHaveBeenCalledWith(id, updateEnvironmentDto);
-      expect(result).toEqual(updatedEnvironment);
-    });
-
-    it('should throw NotFoundException when environment is not found', async () => {
-      const id = '1';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {
-        name: 'Updated Environment',
-        status: Status.LOCKED,
-      };
-
-      mockEnvironmentRepository.findById.mockResolvedValue(undefined);
-
-      await expect(environmentsService.approve(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
-    });
-
-    it('should throw BadRequestException when environment status is not PENDING', async () => {
-      const id = '1';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {
-        name: 'Updated Environment',
-        status: Status.LOCKED,
-      };
-
-      const environment: Environment = {
-        id,
-        name: 'Test Environment',
-        status: Status.AVAILABLE,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-
-      mockEnvironmentRepository.findById.mockResolvedValue(environment);
-
-      await expect(environmentsService.approve(id, updateEnvironmentDto)).rejects.toThrowError(BadRequestException);
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
     });
   });
 });
