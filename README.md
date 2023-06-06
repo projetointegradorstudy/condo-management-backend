@@ -33,47 +33,55 @@ It can be accessed through the endpoint `http://{your_host}:{your_port}/api/v1/d
 ## Installation
 
 ```bash
-$ npm install
+npm install
 ```
 - Make a copy of the file .env.example
 - Rename the copy to .env
 
 ## Running the containerized database
 
-- Start containers
+Start containers
 ```bash
 docker compose up -d
 ```
 
-- Kill containers
+Kill containers
 ```bash
 docker compose down
 ```
 
 ## Running the app
 
+Development
 ```bash
-# development
-$ npm run start
+npm run start
+```
 
-# watch mode
-$ npm run start:dev
+Watch mode
+```bash
+npm run start:dev
+```
 
-# production mode
-$ npm run start:prod
+Production mode
+```bash
+npm run start:prod
 ```
 
 ## Test
 
+Unit tests
 ```bash
-# unit tests
-$ npm run test
+npm run test
+```
 
-# e2e tests
-$ npm run test:e2e
+e2e tests
+```bash
+npm run test:e2e
+```
 
-# test coverage
-$ npm run test:cov
+Test coverage
+```bash
+npm run test:cov
 ```
 
 ## Support

@@ -23,8 +23,8 @@ export class UsersService implements IUserService {
     return user;
   }
 
-  async findToLogin(username: string) {
-    return await this.userRepository.findWtCredencial(username);
+  async findToLogin(email: string) {
+    return await this.userRepository.findWtCredencial(email);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {

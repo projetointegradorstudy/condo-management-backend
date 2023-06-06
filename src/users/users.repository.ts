@@ -26,10 +26,10 @@ export class UsersRepository extends Repository<User> implements IUserRepository
     return await this.usersRepository.findOne({ where: { id } });
   }
 
-  async findWtCredencial(username: string) {
+  async findWtCredencial(email: string) {
     return await this.usersRepository
       .createQueryBuilder('user')
-      .where(`user.username = '${username}'`)
+      .where(`user.email = '${email}'`)
       .addSelect('user.password')
       .getOne();
   }

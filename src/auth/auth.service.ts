@@ -10,8 +10,8 @@ export class AuthService {
   constructor(private usersService: UsersService, private jwtService: JwtService) {}
 
   async login(authCredentialsDto: AuthCredentialsDto): Promise<{ access_token: string }> {
-    const user = await this.usersService.findToLogin(authCredentialsDto.username);
-    if (!user) throw new UnauthorizedException('Wrong username');
+    const user = await this.usersService.findToLogin(authCredentialsDto.email);
+    if (!user) throw new UnauthorizedException('Wrong email');
     if (!(await bcrypt.compare(authCredentialsDto.password, user.password)))
       throw new UnauthorizedException('Invalid credentials');
     delete user.password;
