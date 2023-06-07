@@ -23,17 +23,17 @@ export class User extends BaseEntity {
   @Column({ nullable: true })
   avatar?: string;
 
-  @ApiProperty({ example: 'John Doo' })
-  @Column()
-  name: string;
+  @ApiProperty({ example: 'John Doo', nullable: true })
+  @Column({ nullable: true })
+  name?: string;
 
   @ApiProperty({ uniqueItems: true, example: 'john_doo@contoso.com' })
   @Column({ unique: true })
   email: string;
 
-  @ApiProperty({ example: 'Abc123@4' })
-  @Column({ select: false })
-  password: string;
+  @ApiProperty({ example: 'Abc123@4', nullable: true })
+  @Column({ select: false, nullable: true })
+  password?: string;
 
   @ApiProperty({ type: 'enum', enum: Role, default: 'user' })
   @Column({ type: 'enum', enum: Role, default: Role.USER })
