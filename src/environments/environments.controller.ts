@@ -29,21 +29,6 @@ export class EnvironmentsController {
     return this.environmentsService.update(uuid, updateEnvironmentDto);
   }
 
-  @Patch(':uuid/request')
-  request(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() updateEnvironmentDto: UpdateEnvironmentDto) {
-    return this.environmentsService.request(uuid, updateEnvironmentDto);
-  }
-
-  @Patch(':uuid/approve')
-  approve(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() updateEnvironmentDto: UpdateEnvironmentDto) {
-    return this.environmentsService.approve(uuid, updateEnvironmentDto);
-  }
-
-  @Patch(':uuid/release')
-  release(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() updateEnvironmentDto: UpdateEnvironmentDto) {
-    return this.environmentsService.release(uuid, updateEnvironmentDto);
-  }
-
   @Delete(':uuid')
   remove(@Param('uuid', ParseUUIDPipe) uuid: string) {
     return this.environmentsService.remove(uuid);
