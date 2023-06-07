@@ -27,9 +27,9 @@ export class User extends BaseEntity {
   @Column()
   name: string;
 
-  @ApiProperty({ uniqueItems: true, example: 'john_doo' })
+  @ApiProperty({ uniqueItems: true, example: 'john_doo@contoso.com' })
   @Column({ unique: true })
-  username: string;
+  email: string;
 
   @ApiProperty({ example: 'Abc123@4' })
   @Column({ select: false })
@@ -39,9 +39,13 @@ export class User extends BaseEntity {
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role;
 
-  @ApiProperty()
-  @CreateDateColumn()
-  registered_at: Date;
+  @ApiProperty({ example: true, default: false })
+  @Column({ default: false })
+  is_active: boolean;
+
+  @ApiProperty({ nullable: true })
+  @Column({ nullable: true })
+  partial_token?: string;
 
   @ApiProperty()
   @CreateDateColumn()
