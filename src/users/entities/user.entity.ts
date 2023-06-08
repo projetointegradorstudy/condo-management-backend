@@ -7,6 +7,7 @@ import {
   BeforeInsert,
   BeforeUpdate,
   BaseEntity,
+  DeleteDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
@@ -54,6 +55,10 @@ export class User extends BaseEntity {
   @ApiProperty()
   @UpdateDateColumn()
   updated_at: Date;
+
+  @ApiProperty({ required: false })
+  @DeleteDateColumn({ nullable: true })
+  deleted_at?: Date;
 
   @BeforeInsert()
   @BeforeUpdate()

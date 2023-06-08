@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Entity } from 'typeorm';
+import { PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, Entity, DeleteDateColumn } from 'typeorm';
 import { Status } from './status.enum';
 
 @Entity({ name: 'environment' })
@@ -35,4 +35,8 @@ export class Environment {
   @ApiProperty()
   @UpdateDateColumn()
   updated_at: Date;
+
+  @ApiProperty({ required: false })
+  @DeleteDateColumn({ nullable: true })
+  deleted_at?: Date;
 }
