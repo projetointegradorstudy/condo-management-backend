@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -7,7 +7,10 @@ import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService, private jwtService: JwtService) {}
+  constructor(
+    @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
 
   async login(authCredentialsDto: AuthCredentialsDto): Promise<{ access_token: string }> {
     const user = await this.usersService.findToLogin(authCredentialsDto.email);

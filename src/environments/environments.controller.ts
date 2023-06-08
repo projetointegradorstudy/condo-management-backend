@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Inject, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseUUIDPipe, Query } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
-import { IEnvironmentService } from './interfaces/environments.service';
 import { ApiTags } from '@nestjs/swagger';
+import { EnvironmentsService } from './environments.service';
 
 @ApiTags('Environments')
 @Controller('environments')
 export class EnvironmentsController {
-  constructor(@Inject(IEnvironmentService) private readonly environmentsService: IEnvironmentService) {}
+  constructor(private readonly environmentsService: EnvironmentsService) {}
 
   @Post()
   create(@Body() createEnvironmentDto: CreateEnvironmentDto) {

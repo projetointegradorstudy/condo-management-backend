@@ -5,7 +5,9 @@ import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { IEnvironmentRepository } from './interfaces/environments.repository';
 import { Status } from './entities/status.enum';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class EnvironmentRepository extends Repository<Environment> implements IEnvironmentRepository {
   constructor(
     @InjectRepository(Environment)

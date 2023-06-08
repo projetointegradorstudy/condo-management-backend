@@ -7,6 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { EnvironmentsModule } from './environments/environments.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
 @Module({
   imports: [
@@ -21,6 +23,26 @@ import { EnvironmentsModule } from './environments/environments.module';
         database: 'condo-project',
         entities: ['dist/**/*.entity{.ts,.js}'],
         synchronize: true,
+      }),
+    }),
+    MailerModule.forRootAsync({
+      useFactory: () => ({
+        transport: {
+          name: process.env.MAIN_EMAIL_DOMAIN,
+          host: process.env.MAIN_EMAIL_HOST,
+          port: +process.env.MAIN_EMAIL_PORT,
+          auth: {
+            user: process.env.MAIN_EMAIL,
+            pass: process.env.MAIN_EMAIL_PASSWORD,
+          },
+        },
+        defaults: {
+          from: '"no-reply@condo-management.com" <no.reply.condo.management@gmail.com>',
+        },
+        template: {
+          dir: __dirname + '/templates',
+          adapter: new HandlebarsAdapter(),
+        },
       }),
     }),
     AuthModule,

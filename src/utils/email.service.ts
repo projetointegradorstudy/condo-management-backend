@@ -2,13 +2,13 @@ import { HttpException, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as path from 'path';
-import { User } from 'src/users/entities/user.entity';
+import { AdminCreateUserDto } from 'src/users/dto/admin-create-user.dto';
 
 @Injectable()
 export class EmailService {
   constructor(private mailerService: MailerService) {}
 
-  async sendEmail(user: User, template: string, pin?: number) {
+  async sendEmail(user: AdminCreateUserDto, template: string) {
     user.partial_token = user.partial_token ?? crypto.randomBytes(32).toString('hex');
     const mail = {
       to: user.email,
@@ -17,29 +17,8 @@ export class EmailService {
       context: {
         token: user.partial_token,
         host: process.env.BASE_FRONT_URL,
-        pin,
       },
       attachments: [
-        {
-          filename: 'iconInstagram.png',
-          path: path.resolve(__dirname, '..', '..', 'templates/attachments/iconInstagram.png'),
-          cid: 'iconInsta',
-        },
-        {
-          filename: 'iconLogo.png',
-          path: path.resolve(__dirname, '..', '..', 'templates/attachments/iconLogo.png'),
-          cid: 'iconLogo',
-        },
-        {
-          filename: 'iconTelegram.png',
-          path: path.resolve(__dirname, '..', '..', 'templates/attachments/iconTelegram.png'),
-          cid: 'iconTele',
-        },
-        {
-          filename: 'iconWhatsapp.png',
-          path: path.resolve(__dirname, '..', '..', 'templates/attachments/iconWhatsapp.png'),
-          cid: 'iconWhats',
-        },
         {
           filename: 'logo.png',
           path: path.resolve(__dirname, '..', '..', 'templates/attachments/logo.png'),

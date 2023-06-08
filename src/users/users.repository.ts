@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from './dto/create-user.dto';
+import { AdminCreateUserDto } from './dto/admin-create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
@@ -15,8 +15,8 @@ export class UsersRepository extends Repository<User> implements IUserRepository
     super(usersRepository.target, usersRepository.manager);
   }
 
-  async createUser(createUserDto: CreateUserDto) {
-    const createdUser = this.usersRepository.create(createUserDto);
+  async createUser(adminCreateUserDto: AdminCreateUserDto) {
+    const createdUser = this.usersRepository.create(adminCreateUserDto);
     const storedUser = await this.usersRepository.save(createdUser);
     delete storedUser.password;
     return storedUser;
@@ -24,6 +24,14 @@ export class UsersRepository extends Repository<User> implements IUserRepository
 
   async findById(id: string) {
     return await this.usersRepository.findOne({ where: { id } });
+  }
+
+  async findByToken(token: string) {
+    return await this.usersRepository.findOne({ where: { partial_token: token } });
+  }
+
+  async findByEmail(email: string) {
+    return await this.usersRepository.findOne({ where: { email } });
   }
 
   async findWtCredencial(email: string) {

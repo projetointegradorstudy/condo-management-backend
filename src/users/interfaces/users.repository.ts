@@ -1,12 +1,14 @@
 import { User } from '../entities/user.entity';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { AdminCreateUserDto } from '../dto/admin-create-user.dto';
 import { UpdateUserDto } from '../dto/update-user.dto';
 
 export interface IUserRepository {
-  createUser(createEnvironmentDto: CreateUserDto): Promise<User>;
+  createUser(adminCreateUserDto: AdminCreateUserDto): Promise<User>;
   findById(id: string): Promise<User>;
+  findByToken(token: string): Promise<User>;
+  findByEmail(email: string): Promise<User>;
   findWtCredencial(id: string): Promise<User>;
-  updateUser(id: string, updateEnvironmentDto: UpdateUserDto): Promise<User>;
+  updateUser(id: string, updateUserDto: UpdateUserDto): Promise<User>;
 }
 
 export const IUserRepository = Symbol('IUserRepository');

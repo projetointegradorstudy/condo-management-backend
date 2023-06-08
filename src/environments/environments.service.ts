@@ -1,14 +1,14 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
-import { IEnvironmentRepository } from './interfaces/environments.repository';
 import { Environment } from './entities/environment.entity';
 import { IEnvironmentService } from './interfaces/environments.service';
 import { Status, isComplianceStatus, validateStatus } from './entities/status.enum';
+import { EnvironmentRepository } from './environments.repository';
 
 @Injectable()
 export class EnvironmentsService implements IEnvironmentService {
-  constructor(@Inject(IEnvironmentRepository) private readonly environmentRepository: IEnvironmentRepository) {}
+  constructor(private readonly environmentRepository: EnvironmentRepository) {}
 
   async create(createEnvironmentDto: CreateEnvironmentDto) {
     return await this.environmentRepository.createEnvironment(createEnvironmentDto);
@@ -45,7 +45,7 @@ export class EnvironmentsService implements IEnvironmentService {
   async remove(id: string): Promise<any> {
     const environment = await this.environmentRepository.findById(id);
     if (!environment) throw new NotFoundException();
-    await this.environmentRepository.delete(environment.id);
+    await this.environmentRepository.softDelete(environment.id);
     return { message: 'Environment deleted successfully' };
   }
 }
