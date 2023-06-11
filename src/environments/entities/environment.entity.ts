@@ -20,8 +20,8 @@ export class Environment {
   @Column({ type: 'enum', enum: Status, default: Status.AVAILABLE })
   status: Status;
 
-  @ApiProperty({ example: 'https://aws.test' })
-  @Column()
+  @ApiProperty({ nullable: true, example: 'https://aws.test' })
+  @Column({ nullable: true })
   image?: string;
 
   @ApiProperty({ example: 'Room', default: 0 })

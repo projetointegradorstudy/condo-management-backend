@@ -12,10 +12,10 @@ import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 
 @ApiTags('Users')
 @Controller('users')
-export class UserController {
+export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
   @Post()
