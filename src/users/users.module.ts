@@ -9,6 +9,8 @@ import { EmailExists, PasswordsMatch } from 'src/utils/validations.middleware';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { IUserService } from './interfaces/users.service';
+import { IUserRepository } from './interfaces/users.repository';
 
 @Module({
   imports: [
@@ -24,10 +26,22 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     }),
   ],
   controllers: [UsersController],
-  providers: [UsersService, UsersRepository, EmailService, AuthService],
+  providers: [
+    {
+      provide: IUserService,
+      useClass: UsersService,
+    },
+    {
+      provide: IUserRepository,
+      useClass: UsersRepository,
+    },
+    EmailService,
+    AuthService,
+    UsersService,
+  ],
   exports: [UsersService],
 })
-export class UserModule implements NestModule {
+export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(PasswordsMatch)

@@ -21,13 +21,13 @@ export class EnvironmentsService implements IEnvironmentService {
   }
 
   async findOne(id: string): Promise<Environment> {
-    const environment = await this.environmentRepository.findById({ id });
+    const environment = await this.environmentRepository.findBy({ id });
     if (!environment) throw new NotFoundException();
     return environment;
   }
 
   async update(id: string, updateEnvironmentDto: UpdateEnvironmentDto): Promise<Environment> {
-    const environment = await this.environmentRepository.findById({ id });
+    const environment = await this.environmentRepository.findBy({ id });
     if (!environment) {
       throw new NotFoundException();
     }
@@ -41,7 +41,7 @@ export class EnvironmentsService implements IEnvironmentService {
   }
 
   async remove(id: string): Promise<any> {
-    const environment = await this.environmentRepository.findById({ id });
+    const environment = await this.environmentRepository.findBy({ id });
     if (!environment) throw new NotFoundException();
     await this.environmentRepository.softDelete(environment.id);
     return { message: 'Environment deleted successfully' };

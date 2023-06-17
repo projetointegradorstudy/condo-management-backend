@@ -15,7 +15,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return await this.entity.find(options);
   }
 
-  public async findById(where: FindOptionsWhere<T>): Promise<T> {
+  public async findBy(where: FindOptionsWhere<T>): Promise<T> {
     return await this.entity.findOneBy(where);
   }
 
