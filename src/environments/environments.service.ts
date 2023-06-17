@@ -1,34 +1,33 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
-import { IEnvironmentRepository } from './interfaces/environments.repository';
 import { Environment } from './entities/environment.entity';
 import { IEnvironmentService } from './interfaces/environments.service';
 import { Status, isComplianceStatus, validateStatus } from './entities/status.enum';
+import { IEnvironmentRepository } from './interfaces/environments.repository';
 
 @Injectable()
 export class EnvironmentsService implements IEnvironmentService {
   constructor(@Inject(IEnvironmentRepository) private readonly environmentRepository: IEnvironmentRepository) {}
 
   async create(createEnvironmentDto: CreateEnvironmentDto) {
-    return await this.environmentRepository.createEnvironment(createEnvironmentDto);
+    return await this.environmentRepository.create(createEnvironmentDto);
   }
-  async findAll(status: string): Promise<Environment[]> {
-    if (!validateStatus(status)) {
-      throw new BadRequestException({ message: 'invalid environments status' });
-    }
 
-    return await this.environmentRepository.findEnvironments(status as Status);
+  async findAll(status: string): Promise<Environment[]> {
+    if (!validateStatus(status)) throw new BadRequestException({ message: 'invalid environments status' });
+
+    return await this.environmentRepository.find({ where: { status: status as Status } });
   }
 
   async findOne(id: string): Promise<Environment> {
-    const environment = await this.environmentRepository.findById(id);
+    const environment = await this.environmentRepository.findBy({ id });
     if (!environment) throw new NotFoundException();
     return environment;
   }
 
   async update(id: string, updateEnvironmentDto: UpdateEnvironmentDto): Promise<Environment> {
-    const environment = await this.environmentRepository.findById(id);
+    const environment = await this.environmentRepository.findBy({ id });
     if (!environment) {
       throw new NotFoundException();
     }
@@ -37,15 +36,14 @@ export class EnvironmentsService implements IEnvironmentService {
     if (errorMessage) {
       throw new BadRequestException({ message: errorMessage });
     }
-
-    const updatedEnvironment = await this.environmentRepository.updateEnvironment(id, updateEnvironmentDto);
-    return updatedEnvironment;
+    await this.environmentRepository.update(id, updateEnvironmentDto);
+    return await this.findOne(id);
   }
 
   async remove(id: string): Promise<any> {
-    const environment = await this.environmentRepository.findById(id);
+    const environment = await this.environmentRepository.findBy({ id });
     if (!environment) throw new NotFoundException();
-    await this.environmentRepository.delete(environment.id);
+    await this.environmentRepository.softDelete(environment.id);
     return { message: 'Environment deleted successfully' };
   }
 }

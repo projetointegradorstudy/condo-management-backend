@@ -4,8 +4,8 @@ import { EnvironmentsController } from './environments.controller';
 import { Environment } from './entities/environment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EnvironmentRepository } from './environments.repository';
-import { IEnvironmentRepository } from './interfaces/environments.repository';
 import { IEnvironmentService } from './interfaces/environments.service';
+import { IEnvironmentRepository } from './interfaces/environments.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Environment])],
