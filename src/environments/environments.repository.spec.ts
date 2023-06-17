@@ -2,21 +2,29 @@ import { EnvironmentRepository } from './environments.repository';
 import { Repository } from 'typeorm';
 import { Environment } from './entities/environment.entity';
 import { Status } from './entities/status.enum';
+import { BaseRepository } from 'src/base-entity/base-entity.repository';
 
 describe('EnvironmentRepository', () => {
+  class MockEnvironmentRepository extends BaseRepository<Environment> {
+    constructor() {
+      const mockRepository = {} as Repository<Environment>;
+      super(mockRepository);
+    }
+
+    create = jest.fn();
+    save = jest.fn();
+    findOneBy = jest.fn();
+    find = jest.fn();
+    update = jest.fn();
+    softDelete = jest.fn();
+  }
+
   let environmentRepository: EnvironmentRepository;
-  let mockEnvironmentRepository: jest.Mocked<Repository<Environment>>;
+  let mockEnvironmentRepository: MockEnvironmentRepository;
 
   beforeEach(() => {
-    mockEnvironmentRepository = {
-      create: jest.fn(),
-      save: jest.fn(),
-      findOne: jest.fn(),
-      find: jest.fn(),
-      update: jest.fn(),
-    } as unknown as jest.Mocked<Repository<Environment>>;
-
-    environmentRepository = new EnvironmentRepository(mockEnvironmentRepository);
+    mockEnvironmentRepository = new MockEnvironmentRepository();
+    environmentRepository = new EnvironmentRepository(mockEnvironmentRepository as unknown as Repository<Environment>);
   });
 
   describe('createEnvironment', () => {
@@ -41,7 +49,7 @@ describe('EnvironmentRepository', () => {
       mockEnvironmentRepository.create.mockReturnValue(createEnvironmentDto);
       mockEnvironmentRepository.save.mockResolvedValue(createdEnvironment);
 
-      const result = await environmentRepository.createEnvironment(createEnvironmentDto);
+      const result = await environmentRepository.create(createEnvironmentDto);
 
       expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(createEnvironmentDto);
       expect(mockEnvironmentRepository.save).toHaveBeenCalledWith(createEnvironmentDto);
@@ -60,11 +68,11 @@ describe('EnvironmentRepository', () => {
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
       };
-      mockEnvironmentRepository.findOne.mockResolvedValue(foundEnvironment);
+      mockEnvironmentRepository.findOneBy.mockResolvedValue(foundEnvironment);
 
-      const result = await environmentRepository.findById(id);
+      const result = await environmentRepository.findBy({ id });
 
-      expect(mockEnvironmentRepository.findOne).toHaveBeenCalledWith({ where: { id } });
+      expect(mockEnvironmentRepository.findOneBy).toHaveBeenCalledWith({ id });
       expect(result).toEqual(foundEnvironment);
     });
   });
@@ -91,16 +99,17 @@ describe('EnvironmentRepository', () => {
 
       mockEnvironmentRepository.create.mockReturnValue(updateEnvironmentDto);
       mockEnvironmentRepository.update.mockResolvedValue(undefined);
-      mockEnvironmentRepository.findOne.mockResolvedValue(updatedEnvironment);
+      mockEnvironmentRepository.findOneBy.mockResolvedValue(updatedEnvironment);
 
-      const result = await environmentRepository.updateEnvironment(id, updateEnvironmentDto);
+      const result = await environmentRepository.update({ id }, updateEnvironmentDto);
 
       expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(updateEnvironmentDto);
       expect(mockEnvironmentRepository.update).toHaveBeenCalledWith({ id }, updateEnvironmentDto);
-      expect(mockEnvironmentRepository.findOne).toHaveBeenCalledWith({ where: { id } });
+      expect(mockEnvironmentRepository.findOneBy).toHaveBeenCalledWith({ id });
       expect(result).toEqual(updatedEnvironment);
     });
   });
+
   describe('findEnvironments', () => {
     it('should find environments by status', async () => {
       const status = Status.AVAILABLE;
@@ -126,7 +135,7 @@ describe('EnvironmentRepository', () => {
 
       mockEnvironmentRepository.find.mockResolvedValue(foundEnvironments);
 
-      const result = await environmentRepository.findEnvironments(status);
+      const result = await environmentRepository.find({ where: { status } });
 
       expect(mockEnvironmentRepository.find).toHaveBeenCalledWith({ where: { status } });
       expect(result).toEqual(foundEnvironments);
@@ -154,9 +163,9 @@ describe('EnvironmentRepository', () => {
 
       mockEnvironmentRepository.find.mockResolvedValue(foundEnvironments);
 
-      const result = await environmentRepository.findEnvironments(undefined);
+      const result = await environmentRepository.find();
 
-      expect(mockEnvironmentRepository.find).toHaveBeenCalledWith();
+      expect(mockEnvironmentRepository.find).toHaveBeenCalled();
       expect(result).toEqual(foundEnvironments);
     });
   });

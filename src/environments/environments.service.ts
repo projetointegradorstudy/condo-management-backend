@@ -36,8 +36,7 @@ export class EnvironmentsService implements IEnvironmentService {
     if (errorMessage) {
       throw new BadRequestException({ message: errorMessage });
     }
-    await this.environmentRepository.update(id, updateEnvironmentDto);
-    return await this.findOne(id);
+    return await this.environmentRepository.update({ id }, updateEnvironmentDto);
   }
 
   async remove(id: string): Promise<any> {

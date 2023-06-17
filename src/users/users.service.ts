@@ -51,22 +51,20 @@ export class UsersService implements IUserService {
   }
 
   async updateByAdmin(id: string, adminUpdateUserDto: AdminUpdateUserDto) {
-    const user = await this.findOne(id);
-    await this.userRepository.update(user.id, adminUpdateUserDto);
-    return await this.findOne(id);
+    await this.findOne(id);
+    return await this.userRepository.update({ id }, adminUpdateUserDto);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.findOne(id);
-    await this.userRepository.update(user.id, updateUserDto);
-    return await this.findOne(id);
+    await this.findOne(id);
+    return await this.userRepository.update({ id }, updateUserDto);
   }
 
   async createPassword(token: string, createUserPasswordDto: CreateUserPasswordDto) {
     const user = await this.findOneByToken(token);
     createUserPasswordDto.partial_token = null;
     createUserPasswordDto.is_active = true;
-    await this.userRepository.update(user.id, createUserPasswordDto);
+    await this.userRepository.update({ id: user.id }, createUserPasswordDto);
     const auth: AuthCredentialsDto = { email: user.email, password: createUserPasswordDto.password };
     return await this.authService.login(auth);
   }
@@ -75,15 +73,15 @@ export class UsersService implements IUserService {
     const user = await this.userRepository.findBy({ email: requestEmailDto.email });
     if (!user) throw new HttpException({ message: 'An email with recovery password instructions will be sent' }, 200);
     await this.emailService.sendEmail(user, 'Recover-password');
-    await this.userRepository.update(user.id, { partial_token: user.partial_token });
+    await this.userRepository.update({ id: user.id }, { partial_token: user.partial_token });
     return {
       message: 'An email with recovery password instructions will be sent',
     };
   }
 
   async remove(id: string) {
-    const user = await this.findOne(id);
-    await this.userRepository.softDelete(user.id);
+    await this.findOne(id);
+    await this.userRepository.softDelete(id);
     return { message: 'User deleted successfully' };
   }
 }

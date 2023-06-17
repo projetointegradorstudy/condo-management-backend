@@ -135,22 +135,12 @@ describe('EnvironmentsController', () => {
     it('should remove the environment with the specified id', async () => {
       const id = '12345';
 
-      const removedEnvironment: Environment = {
-        id: '12345',
-        name: 'Removed Environment',
-        description: 'Removed environment description',
-        status: Status.AVAILABLE,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-
-      mockEnvironmentService.remove.mockResolvedValue(removedEnvironment);
+      mockEnvironmentService.remove.mockResolvedValue({ message: 'Environment deleted successfully' });
 
       const result = await environmentsController.remove(id);
 
       expect(mockEnvironmentService.remove).toHaveBeenCalledWith(id);
-      expect(result).toBe(removedEnvironment);
+      expect(result).toEqual({ message: 'Environment deleted successfully' });
     });
   });
 });

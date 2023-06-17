@@ -11,11 +11,11 @@ describe('EnvironmentsService', () => {
 
   beforeEach(() => {
     mockEnvironmentRepository = {
-      createEnvironment: jest.fn(),
-      findEnvironments: jest.fn(),
-      findById: jest.fn(),
-      updateEnvironment: jest.fn(),
-      delete: jest.fn(),
+      create: jest.fn(),
+      find: jest.fn(),
+      findBy: jest.fn(),
+      update: jest.fn(),
+      softDelete: jest.fn(),
     } as unknown as jest.Mocked<IEnvironmentRepository>;
 
     environmentsService = new EnvironmentsService(mockEnvironmentRepository);
@@ -40,11 +40,11 @@ describe('EnvironmentsService', () => {
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.createEnvironment.mockResolvedValue(createdEnvironment);
+      mockEnvironmentRepository.create.mockResolvedValue(createdEnvironment);
 
       const result = await environmentsService.create(createEnvironmentDto);
 
-      expect(mockEnvironmentRepository.createEnvironment).toHaveBeenCalledWith(createEnvironmentDto);
+      expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(createEnvironmentDto);
       expect(result).toEqual(createdEnvironment);
     });
   });
@@ -72,21 +72,21 @@ describe('EnvironmentsService', () => {
         },
       ];
 
-      mockEnvironmentRepository.findEnvironments.mockResolvedValue(environments);
+      mockEnvironmentRepository.find.mockResolvedValue(environments);
 
       const result = await environmentsService.findAll(status);
 
-      expect(mockEnvironmentRepository.findEnvironments).toHaveBeenCalledWith(status);
+      expect(mockEnvironmentRepository.find).toHaveBeenCalledWith({ where: { status } });
       expect(result).toEqual(environments);
     });
 
     it('should throw BadRequestException when an invalid status is provided', async () => {
       const invalidStatus = 'invalid';
 
-      mockEnvironmentRepository.findEnvironments.mockResolvedValue([]);
+      mockEnvironmentRepository.find.mockResolvedValue([]);
 
       await expect(environmentsService.findAll(invalidStatus)).rejects.toThrowError(BadRequestException);
-      expect(mockEnvironmentRepository.findEnvironments).not.toHaveBeenCalled();
+      expect(mockEnvironmentRepository.find).not.toHaveBeenCalled();
     });
   });
 
@@ -102,18 +102,18 @@ describe('EnvironmentsService', () => {
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.findById.mockResolvedValue(foundEnvironment);
+      mockEnvironmentRepository.findBy.mockResolvedValue(foundEnvironment);
 
       const result = await environmentsService.findOne(id);
 
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
+      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
       expect(result).toEqual(foundEnvironment);
     });
 
     it('should throw NotFoundException when environment is not found', async () => {
       const id = 'not found';
 
-      mockEnvironmentRepository.findById.mockResolvedValue(undefined);
+      mockEnvironmentRepository.findBy.mockResolvedValue(undefined);
 
       await expect(environmentsService.findOne(id)).rejects.toThrowError(NotFoundException);
     });
@@ -144,13 +144,13 @@ describe('EnvironmentsService', () => {
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.findById.mockResolvedValue(existingEnvironment);
-      mockEnvironmentRepository.updateEnvironment.mockResolvedValue(updatedEnvironment);
+      mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
+      mockEnvironmentRepository.update.mockResolvedValue(updatedEnvironment);
 
       const result = await environmentsService.update(id, updateEnvironmentDto);
 
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).toHaveBeenCalledWith(id, updateEnvironmentDto);
+      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
+      expect(mockEnvironmentRepository.update).toHaveBeenCalledWith({ id }, updateEnvironmentDto);
       expect(result).toEqual(updatedEnvironment);
     });
 
@@ -162,11 +162,11 @@ describe('EnvironmentsService', () => {
         capacity: 4,
       };
 
-      mockEnvironmentRepository.findById.mockResolvedValue(null);
+      mockEnvironmentRepository.findBy.mockResolvedValue(null);
 
       await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
+      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
+      expect(mockEnvironmentRepository.update).not.toHaveBeenCalled();
     });
 
     it('should throw BadRequestException for non-compliant status', async () => {
@@ -185,11 +185,11 @@ describe('EnvironmentsService', () => {
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.findById.mockResolvedValue(existingEnvironment);
+      mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
 
       await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(BadRequestException);
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.updateEnvironment).not.toHaveBeenCalled();
+      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
+      expect(mockEnvironmentRepository.update).not.toHaveBeenCalled();
     });
   });
 
@@ -205,20 +205,20 @@ describe('EnvironmentsService', () => {
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.findById.mockResolvedValue(environment);
-      mockEnvironmentRepository.delete.mockResolvedValue(undefined);
+      mockEnvironmentRepository.findBy.mockResolvedValue(environment);
+      mockEnvironmentRepository.softDelete.mockResolvedValue(undefined);
 
       const result = await environmentsService.remove(id);
 
-      expect(mockEnvironmentRepository.findById).toHaveBeenCalledWith(id);
-      expect(mockEnvironmentRepository.delete).toHaveBeenCalledWith(environment.id);
+      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
+      expect(mockEnvironmentRepository.softDelete).toHaveBeenCalledWith(environment.id);
       expect(result).toEqual({ message: 'Environment deleted successfully' });
     });
 
     it('should throw NotFoundException when environment is not found', async () => {
       const id = 'not found';
 
-      mockEnvironmentRepository.findById.mockResolvedValue(undefined);
+      mockEnvironmentRepository.findBy.mockResolvedValue(undefined);
 
       await expect(environmentsService.remove(id)).rejects.toThrowError(NotFoundException);
     });
