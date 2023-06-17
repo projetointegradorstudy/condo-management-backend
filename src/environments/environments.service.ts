@@ -14,6 +14,10 @@ export class EnvironmentsService implements IEnvironmentService {
     return await this.environmentRepository.create(createEnvironmentDto);
   }
 
+  async count() {
+    return await this.environmentRepository.count();
+  }
+
   async findAll(status: string): Promise<Environment[]> {
     if (!validateStatus(status)) throw new BadRequestException({ message: 'invalid environments status' });
 

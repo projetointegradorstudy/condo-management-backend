@@ -10,6 +10,7 @@ import {
   UseGuards,
   Req,
   Inject,
+  Query,
 } from '@nestjs/common';
 import { AdminCreateUserDto } from './dto/admin-create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -21,6 +22,7 @@ import { Role } from 'src/auth/roles/role.enum';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 import { IUserService } from './interfaces/users.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @ApiTags('Users')
 @Controller('users')
@@ -38,7 +40,15 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()
-  @Get('')
+  @Get('count')
+  count() {
+    return this.usersService.count();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN)
+  @ApiBearerAuth()
+  @Get()
   findAll() {
     return this.usersService.findAll();
   }
@@ -68,9 +78,9 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
-  @Patch(':uuid/update')
-  update(@Param('uuid', ParseUUIDPipe) uuid: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(uuid, updateUserDto);
+  @Patch('myself/update')
+  update(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(req.user.user.id, updateUserDto);
   }
 
   @Patch(':token/create-password')
@@ -79,8 +89,13 @@ export class UsersController {
   }
 
   @Patch('send-reset-email')
-  sendResetPassEmail(@Body() requestResetPasswordDto: AdminCreateUserDto) {
-    return this.usersService.sendResetPassEmail(requestResetPasswordDto);
+  sendResetPassEmail(@Query('email') email: string) {
+    return this.usersService.sendResetPassEmail(email);
+  }
+
+  @Patch('reset-password')
+  resetPassword(@Query('token') token: string, @Body() resetPasswordDto: ResetPasswordDto) {
+    return this.usersService.resetPassword(token, resetPasswordDto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
