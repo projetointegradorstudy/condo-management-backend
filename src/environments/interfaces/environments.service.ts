@@ -7,7 +7,7 @@ export interface IEnvironmentService {
   count(): Promise<number>;
   findAll(status: string): Promise<Environment[]>;
   findOne(id: string): Promise<Environment>;
-  update(id: string, updateEnvironmentDto: UpdateEnvironmentDto): Promise<Environment>;
+  update(id: string, updateEnvironmentDto: UpdateEnvironmentDto, image?: Express.Multer.File): Promise<Environment>;
   remove(id: string): Promise<{ message: string }>;
 }
 

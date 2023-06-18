@@ -14,7 +14,7 @@ export interface IUserService {
   findOneByToken(token: string): Promise<User>;
   findOneByEmail(email: string): Promise<User>;
   updateByAdmin(id: string, adminUpdateUserDto: AdminUpdateUserDto): Promise<User>;
-  update(id: string, updateUserDto: UpdateUserDto): Promise<User>;
+  update(id: string, updateUserDto: UpdateUserDto, image?: Express.Multer.File): Promise<User>;
   createPassword(token: string, createUserPasswordDto: CreateUserPasswordDto): Promise<{ access_token: string }>;
   sendResetPassEmail(email: string): Promise<{ message: string }>;
   resetPassword(token: string, resetPasswordDto: ResetPasswordDto): Promise<{ access_token: string }>;

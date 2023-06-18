@@ -11,6 +11,7 @@ import {
   Req,
   Inject,
   Query,
+  UploadedFile,
 } from '@nestjs/common';
 import { AdminCreateUserDto } from './dto/admin-create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -23,7 +24,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 import { IUserService } from './interfaces/users.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-
+import { UpdateUser } from 'src/decorators/update-user.decorator';
+import { fileMimetypeFilter } from 'src/utils/file-mimetype-filter';
+import { ParseFile } from 'src/utils/parse-file.pipe';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
@@ -79,8 +82,12 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Patch('myself/update')
-  update(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(req.user.user.id, updateUserDto);
+  @UpdateUser(['image', 'name', 'password', 'passwordConfirmation'], false, {
+    fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
+    limits: { fileSize: 5242880 /** <- 5mb */ },
+  })
+  update(@Req() req: any, @Body() updateUserDto: UpdateUserDto, @UploadedFile(ParseFile) image?: Express.Multer.File) {
+    return this.usersService.update(req.user.user.id, updateUserDto, image);
   }
 
   @Patch(':token/create-password')

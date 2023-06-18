@@ -11,6 +11,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IUserService } from './interfaces/users.service';
 import { IUserRepository } from './interfaces/users.repository';
+import { S3Service } from 'src/utils/s3.service';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { IUserRepository } from './interfaces/users.repository';
       useClass: UsersRepository,
     },
     EmailService,
+    S3Service,
     AuthService,
     UsersService,
   ],
