@@ -7,7 +7,7 @@ const getEnumValues = (enumObject: any): string[] => {
   return Object.keys(enumObject).map((key) => enumObject[key]);
 };
 
-export function UpdateEnvironment(fieldName: string[], required = false, localOptions?: MulterOptions) {
+export function FormDataEnvironment(fieldName: string[], required = false, localOptions?: MulterOptions) {
   return applyDecorators(
     UseInterceptors(FileInterceptor(fieldName[0], localOptions)),
     ApiConsumes('multipart/form-data'),

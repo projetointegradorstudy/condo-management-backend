@@ -6,7 +6,7 @@ import * as crypto from 'crypto';
 export class S3Service {
   s3 = new AWS.S3({ accessKeyId: process.env.AWS_ACCESS_KEY_ID, secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY });
 
-  async uploadFile(file: Express.Multer.File, currentFileKey: string) {
+  async uploadFile(file: Express.Multer.File, currentFileKey?: string) {
     const params = {
       Bucket: process.env.AWS_PUBLIC_BUCKET_NAME,
       Key: `attach-${crypto.randomBytes(8).toString('hex')}.${file.mimetype.split('/')[1]}`,

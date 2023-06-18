@@ -20,7 +20,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { Roles } from 'src/auth/roles/roles.decorator';
 import { Role } from 'src/auth/roles/role.enum';
-import { UpdateEnvironment } from 'src/decorators/update-environment.decorator';
+import { FormDataEnvironment } from 'src/decorators/formdata-environment.decorator';
 import { fileMimetypeFilter } from 'src/utils/file-mimetype-filter';
 import { ParseFile } from 'src/utils/parse-file.pipe';
 
@@ -33,8 +33,12 @@ export class EnvironmentsController {
 
   @Roles(Role.ADMIN)
   @Post()
-  create(@Body() createEnvironmentDto: CreateEnvironmentDto) {
-    return this.environmentsService.create(createEnvironmentDto);
+  @FormDataEnvironment(['name', 'status'], true, {
+    fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
+    limits: { fileSize: 5242880 /** <- 5mb */ },
+  })
+  create(@Body() createEnvironmentDto: CreateEnvironmentDto, @UploadedFile(ParseFile) image?: Express.Multer.File) {
+    return this.environmentsService.create(createEnvironmentDto, image);
   }
 
   @Roles(Role.ADMIN)
@@ -55,7 +59,7 @@ export class EnvironmentsController {
 
   @Roles(Role.ADMIN)
   @Patch(':uuid')
-  @UpdateEnvironment(['image', 'name', 'description', 'status', 'capacity'], false, {
+  @FormDataEnvironment(['image', 'name', 'description', 'status', 'capacity'], false, {
     fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
     limits: { fileSize: 5242880 /** <- 5mb */ },
   })

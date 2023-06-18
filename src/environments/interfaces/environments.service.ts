@@ -3,7 +3,7 @@ import { UpdateEnvironmentDto } from '../dto/update-environment.dto';
 import { Environment } from '../entities/environment.entity';
 
 export interface IEnvironmentService {
-  create(createEnvironmentDto: CreateEnvironmentDto): Promise<Environment>;
+  create(createEnvironmentDto: CreateEnvironmentDto, image?: Express.Multer.File): Promise<Environment>;
   count(): Promise<number>;
   findAll(status: string): Promise<Environment[]>;
   findOne(id: string): Promise<Environment>;

@@ -14,7 +14,11 @@ export class EnvironmentsService implements IEnvironmentService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async create(createEnvironmentDto: CreateEnvironmentDto) {
+  async create(createEnvironmentDto: CreateEnvironmentDto, image?: Express.Multer.File) {
+    if (image) {
+      const imageUploaded = await this.s3Service.uploadFile(image);
+      createEnvironmentDto['image'] = imageUploaded.Location;
+    }
     return await this.environmentRepository.create(createEnvironmentDto);
   }
 
