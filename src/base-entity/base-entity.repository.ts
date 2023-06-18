@@ -12,6 +12,10 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return await this.entity.save(createdEntity);
   }
 
+  public async count(options?: FindManyOptions<T>): Promise<number> {
+    return await this.entity.count(options);
+  }
+
   public async find(options?: FindManyOptions<T>): Promise<T[]> {
     return await this.entity.find(options);
   }

@@ -2,6 +2,7 @@ import { DeepPartial, DeleteResult, FindManyOptions, FindOptionsWhere } from 'ty
 
 export interface IBaseRepository<T> {
   create(data: DeepPartial<T>): Promise<T>;
+  count(options?: FindManyOptions<T>): Promise<number>;
   find(options?: FindManyOptions<T>): Promise<T[]>;
   findBy(where: FindOptionsWhere<T>): Promise<T>;
   update(id: FindOptionsWhere<T>, data: DeepPartial<T>): Promise<T>;

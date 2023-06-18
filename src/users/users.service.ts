@@ -8,6 +8,7 @@ import { EmailService } from 'src/utils/email.service';
 import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 import { AuthCredentialsDto } from 'src/auth/dto/auth-credentials.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 @Injectable()
 export class UsersService implements IUserService {
@@ -22,6 +23,10 @@ export class UsersService implements IUserService {
     await this.emailService.sendEmail(adminCreateUserDto, 'Create-password');
     await this.userRepository.create(adminCreateUserDto);
     return { message: 'User created successfully' };
+  }
+
+  async count() {
+    return await this.userRepository.count();
   }
 
   async findAll() {
@@ -69,14 +74,21 @@ export class UsersService implements IUserService {
     return await this.authService.login(auth);
   }
 
-  async sendResetPassEmail(requestEmailDto: AdminCreateUserDto) {
-    const user = await this.userRepository.findBy({ email: requestEmailDto.email });
+  async sendResetPassEmail(email: string) {
+    const user = await this.userRepository.findBy({ email });
     if (!user) throw new HttpException({ message: 'An email with recovery password instructions will be sent' }, 200);
     await this.emailService.sendEmail(user, 'Recover-password');
     await this.userRepository.update({ id: user.id }, { partial_token: user.partial_token });
     return {
       message: 'An email with recovery password instructions will be sent',
     };
+  }
+
+  async resetPassword(token: string, resetPasswordDto: ResetPasswordDto) {
+    const user = await this.findOneByToken(token);
+    await this.userRepository.update({ id: user.id }, { password: resetPasswordDto.password, partial_token: null });
+    const auth: AuthCredentialsDto = { email: user.email, password: resetPasswordDto.password };
+    return await this.authService.login(auth);
   }
 
   async remove(id: string) {

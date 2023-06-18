@@ -33,6 +33,12 @@ export class EnvironmentsController {
     return this.environmentsService.create(createEnvironmentDto);
   }
 
+  @Roles(Role.ADMIN)
+  @Get('count')
+  count() {
+    return this.environmentsService.count();
+  }
+
   @Get()
   findAll(@Query('status') status?: string) {
     return this.environmentsService.findAll(status);

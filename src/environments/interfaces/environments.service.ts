@@ -4,6 +4,7 @@ import { Environment } from '../entities/environment.entity';
 
 export interface IEnvironmentService {
   create(createEnvironmentDto: CreateEnvironmentDto): Promise<Environment>;
+  count(): Promise<number>;
   findAll(status: string): Promise<Environment[]>;
   findOne(id: string): Promise<Environment>;
   update(id: string, updateEnvironmentDto: UpdateEnvironmentDto): Promise<Environment>;
