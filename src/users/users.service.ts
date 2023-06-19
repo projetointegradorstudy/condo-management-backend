@@ -9,12 +9,14 @@ import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 import { AuthCredentialsDto } from 'src/auth/dto/auth-credentials.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
+import { S3Service } from 'src/utils/s3.service';
 
 @Injectable()
 export class UsersService implements IUserService {
   constructor(
     @Inject(IUserRepository) private readonly userRepository: IUserRepository,
     private readonly emailService: EmailService,
+    private readonly s3Service: S3Service,
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
   ) {}
@@ -60,8 +62,12 @@ export class UsersService implements IUserService {
     return await this.userRepository.update({ id }, adminUpdateUserDto);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    await this.findOne(id);
+  async update(id: string, updateUserDto: UpdateUserDto, image?: Express.Multer.File) {
+    const user = await this.findOne(id);
+    if (image) {
+      const imageUploaded = await this.s3Service.uploadFile(image, user.avatar);
+      updateUserDto['avatar'] = imageUploaded.Location;
+    }
     return await this.userRepository.update({ id }, updateUserDto);
   }
 

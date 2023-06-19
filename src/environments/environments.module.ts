@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EnvironmentRepository } from './environments.repository';
 import { IEnvironmentService } from './interfaces/environments.service';
 import { IEnvironmentRepository } from './interfaces/environments.repository';
+import { S3Service } from 'src/utils/s3.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Environment])],
@@ -19,6 +20,7 @@ import { IEnvironmentRepository } from './interfaces/environments.repository';
       provide: IEnvironmentRepository,
       useClass: EnvironmentRepository,
     },
+    S3Service,
   ],
 })
 export class EnvironmentsModule {}

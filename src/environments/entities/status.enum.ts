@@ -2,6 +2,7 @@ export enum Status {
   AVAILABLE = 'available',
   LOCKED = 'locked',
   PENDING = 'pending',
+  DISABLED = 'disabled',
 }
 
 export function validateStatus(status: string): boolean {

@@ -11,6 +11,7 @@ import {
   Req,
   Inject,
   Query,
+  UploadedFile,
 } from '@nestjs/common';
 import { AdminCreateUserDto } from './dto/admin-create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,11 +20,13 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { Roles } from 'src/auth/roles/roles.decorator';
 import { Role } from 'src/auth/roles/role.enum';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 import { IUserService } from './interfaces/users.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-
+import { FormData } from 'src/decorators/form-data.decorator';
+import { fileMimetypeFilter } from 'src/utils/file-mimetype-filter';
+import { ParseFile } from 'src/utils/parse-file.pipe';
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
@@ -79,8 +82,36 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Patch('myself/update')
-  update(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(req.user.user.id, updateUserDto);
+  @FormData(['image', 'name', 'password', 'passwordConfirmation'], false, {
+    fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
+    limits: { fileSize: 5242880 /** <- 5mb */ },
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          description: 'Allows .png, .jpg and jpeg - max size = 5MB',
+          type: 'string',
+          format: 'binary',
+        },
+        name: {
+          description: 'Name to presentation',
+          type: 'string',
+        },
+        password: {
+          description: 'New password, must have 10 character and at least one of each (A-Z, a-z, 0-9, !-@-$-*)',
+          type: 'string',
+        },
+        passwordConfirmation: {
+          description: 'Must be equal to password above',
+          type: 'string',
+        },
+      },
+    },
+  })
+  update(@Req() req: any, @Body() updateUserDto: UpdateUserDto, @UploadedFile(ParseFile) image?: Express.Multer.File) {
+    return this.usersService.update(req.user.user.id, updateUserDto, image);
   }
 
   @Patch(':token/create-password')

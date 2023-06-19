@@ -3,11 +3,6 @@ import { IsOptional, IsString, MinLength } from 'class-validator';
 import { IsValid } from 'src/decorators/validate.decorator';
 
 export class UpdateUserDto {
-  @ApiProperty({ required: false })
-  @IsString()
-  @IsOptional()
-  avatar?: string;
-
   @ApiProperty({ example: 'John Doo', required: false })
   @IsString()
   @IsOptional()
