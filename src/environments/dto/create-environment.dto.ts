@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsEnum, IsOptional, IsNumber } from 'class-validator';
-import { Status } from '../entities/status.enum';
+import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateEnvironmentDto {
@@ -12,12 +11,7 @@ export class CreateEnvironmentDto {
   @ApiProperty({ example: 'Room', nullable: true })
   @IsString()
   @IsOptional()
-  description?: string;
-
-  @ApiProperty({ type: 'enum', enum: Status, example: Status.AVAILABLE, required: true })
-  @IsEnum(Status)
-  @IsNotEmpty()
-  status: Status;
+  description: string;
 
   @ApiProperty({ example: 'https://aws.tes', nullable: true })
   @IsOptional()
@@ -27,5 +21,5 @@ export class CreateEnvironmentDto {
   @IsNumber()
   @IsOptional()
   @Transform((data) => +data.value)
-  capacity?: number;
+  capacity: number;
 }

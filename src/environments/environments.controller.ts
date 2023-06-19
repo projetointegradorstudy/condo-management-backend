@@ -33,7 +33,7 @@ export class EnvironmentsController {
 
   @Roles(Role.ADMIN)
   @Post()
-  @FormDataEnvironment(['name', 'status'], true, {
+  @FormDataEnvironment(['name', 'description', 'capacity'], true, {
     fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
     limits: { fileSize: 5242880 /** <- 5mb */ },
   })

@@ -16,8 +16,8 @@ export class Environment {
   @Column({ nullable: true })
   description?: string;
 
-  @ApiProperty({ type: 'enum', enum: Status, default: 'available' })
-  @Column({ type: 'enum', enum: Status, default: Status.AVAILABLE })
+  @ApiProperty({ type: 'enum', enum: Status, default: Status.DISABLED })
+  @Column({ type: 'enum', enum: Status, default: Status.DISABLED })
   status: Status;
 
   @ApiProperty({ nullable: true, example: 'https://aws.test' })
