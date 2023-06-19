@@ -4,8 +4,8 @@ import { IsEnum, IsOptional } from 'class-validator';
 import { Status } from '../entities/status.enum';
 
 export class UpdateEnvironmentDto extends PartialType(CreateEnvironmentDto) {
-  @ApiProperty({ type: 'enum', enum: Status, example: Status.AVAILABLE, required: true })
+  @ApiProperty({ type: 'enum', enum: Status, example: Status.AVAILABLE })
   @IsEnum(Status)
   @IsOptional()
-  status: Status;
+  status?: Status;
 }
