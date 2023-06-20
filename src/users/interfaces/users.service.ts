@@ -1,3 +1,4 @@
+import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
 import { AdminCreateUserDto } from '../dto/admin-create-user.dto';
 import { AdminUpdateUserDto } from '../dto/admin-update-user.dto';
 import { CreateUserPasswordDto } from '../dto/create-user-password.dto';
@@ -10,6 +11,7 @@ export interface IUserService {
   count(): Promise<number>;
   findAll(): Promise<User[]>;
   findOne(id: string): Promise<User>;
+  findEnvRequestsById(id: string): Promise<EnvRequest[]>;
   findToLogin(id: string): Promise<User>;
   findOneByToken(token: string): Promise<User>;
   findOneByEmail(email: string): Promise<User>;

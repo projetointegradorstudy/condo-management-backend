@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { EnvironmentsModule } from './environments/environments.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { EnvRequestsModule } from './env-requests/env-requests.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     }),
     AuthModule,
     EnvironmentsModule,
+    EnvRequestsModule,
     UsersModule,
   ],
   controllers: [AppController],

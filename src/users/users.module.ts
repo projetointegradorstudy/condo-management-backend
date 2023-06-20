@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
 import { EmailService } from 'src/utils/email.service';
-import { EmailExists, PasswordsMatch } from 'src/utils/validations.middleware';
+import { CheckUUIDParam, EmailExists, PasswordsMatch } from 'src/utils/validations.middleware';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -49,6 +49,8 @@ export class UsersModule implements NestModule {
       .apply(PasswordsMatch)
       .forRoutes({ path: 'users/:token/create-password', method: RequestMethod.PATCH })
       .apply(EmailExists)
-      .forRoutes({ path: 'users', method: RequestMethod.POST });
+      .forRoutes({ path: 'users', method: RequestMethod.POST })
+      .apply(CheckUUIDParam)
+      .forRoutes({ path: 'users/:uuid?/env-requests', method: RequestMethod.PATCH });
   }
 }

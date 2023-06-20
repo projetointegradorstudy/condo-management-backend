@@ -36,9 +36,15 @@ export class UsersService implements IUserService {
   }
 
   async findOne(id: string) {
-    const user = await this.userRepository.findBy({ id });
+    const user = await this.userRepository.findBy({ where: { id } });
     if (!user) throw new NotFoundException();
     return user;
+  }
+
+  async findEnvRequestsById(id: string) {
+    const user = await this.userRepository.findBy({ where: { id }, relations: ['env_requests'] });
+    if (!user) throw new NotFoundException();
+    return user.env_requests;
   }
 
   async findToLogin(email: string) {
@@ -46,13 +52,13 @@ export class UsersService implements IUserService {
   }
 
   async findOneByToken(token: string) {
-    const user = await this.userRepository.findBy({ partial_token: token });
+    const user = await this.userRepository.findBy({ where: { partial_token: token } });
     if (!user) throw new NotFoundException('Invalid token');
     return user;
   }
 
   async findOneByEmail(email: string) {
-    const user = await this.userRepository.findBy({ email });
+    const user = await this.userRepository.findBy({ where: { email } });
     if (!user) throw new NotFoundException('Email not found');
     return user;
   }
@@ -81,7 +87,7 @@ export class UsersService implements IUserService {
   }
 
   async sendResetPassEmail(email: string) {
-    const user = await this.userRepository.findBy({ email });
+    const user = await this.userRepository.findBy({ where: { email } });
     if (!user) throw new HttpException({ message: 'An email with recovery password instructions will be sent' }, 200);
     await this.emailService.sendEmail(user, 'Recover-password');
     await this.userRepository.update({ id: user.id }, { partial_token: user.partial_token });

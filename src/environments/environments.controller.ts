@@ -82,6 +82,13 @@ export class EnvironmentsController {
     return this.environmentsService.findOne(uuid);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get(':uuid?/env-requests')
+  findUserRequests(@Param('uuid', ParseUUIDPipe) uuid: string) {
+    return this.environmentsService.findEnvRequestsById(uuid);
+  }
+
   @Roles(Role.ADMIN)
   @Patch(':uuid')
   @FormData(['image', 'name', 'description', 'status', 'capacity'], false, {
