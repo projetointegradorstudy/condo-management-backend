@@ -89,7 +89,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @ApiBearerAuth()
   @Patch('myself/update')
-  @FormData(['image', 'name', 'password', 'passwordConfirmation'], false, {
+  @FormData(['avatar', 'name', 'password', 'passwordConfirmation'], false, {
     fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
     limits: { fileSize: 5242880 /** <- 5mb */ },
   })
@@ -97,7 +97,7 @@ export class UsersController {
     schema: {
       type: 'object',
       properties: {
-        image: {
+        avatar: {
           description: 'Allows .png, .jpg and jpeg - max size = 5MB',
           type: 'string',
           format: 'binary',
