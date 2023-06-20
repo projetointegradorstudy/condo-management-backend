@@ -7,7 +7,7 @@ import { EmailService } from './email.service';
 import { User } from 'src/users/entities/user.entity';
 
 function checkUUID(field: string): void {
-  if (!isUUID(field)) throw new HttpException({ error: `Must be a valid UUID` }, 200);
+  if (!isUUID(field)) throw new HttpException({ error: `Must be a valid UUID` }, 400);
 }
 
 @Injectable()

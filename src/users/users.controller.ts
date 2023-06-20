@@ -71,6 +71,13 @@ export class UsersController {
     return this.usersService.findOne(req.user.user.id);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @Get(':uuid?/env-requests')
+  findUserRequests(@Req() req: any, @Param('uuid') uuid: string) {
+    return this.usersService.findEnvRequestsById(uuid || req.user.user.id);
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.ADMIN)
   @ApiBearerAuth()

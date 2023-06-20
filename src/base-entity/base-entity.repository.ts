@@ -1,4 +1,4 @@
-import { DeepPartial, Repository, FindManyOptions, DeleteResult, FindOptionsWhere } from 'typeorm';
+import { DeepPartial, Repository, FindManyOptions, DeleteResult, FindOptionsWhere, FindOneOptions } from 'typeorm';
 import { IBaseRepository } from './base-entity.interface';
 
 export class BaseRepository<T> implements IBaseRepository<T> {
@@ -20,8 +20,8 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return await this.entity.find(options);
   }
 
-  public async findBy(where: FindOptionsWhere<T>): Promise<T> {
-    return await this.entity.findOneBy(where);
+  public async findBy(where: FindOneOptions<T>): Promise<T> {
+    return await this.entity.findOne(where);
   }
 
   public async update(id: FindOptionsWhere<T>, partialEntity: DeepPartial<T>): Promise<T> {

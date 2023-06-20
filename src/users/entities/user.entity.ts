@@ -8,11 +8,13 @@ import {
   BeforeUpdate,
   BaseEntity,
   DeleteDateColumn,
+  OneToMany,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Role } from 'src/auth/roles/role.enum';
+import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -59,6 +61,9 @@ export class User extends BaseEntity {
   @ApiProperty({ required: false })
   @DeleteDateColumn({ nullable: true })
   deleted_at?: Date;
+
+  @OneToMany(() => EnvRequest, (envRequest: EnvRequest) => envRequest.user)
+  env_requests: EnvRequest[];
 
   @BeforeInsert()
   @BeforeUpdate()
