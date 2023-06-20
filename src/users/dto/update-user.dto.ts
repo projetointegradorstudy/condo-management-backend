@@ -8,6 +8,10 @@ export class UpdateUserDto {
   @IsOptional()
   name?: string;
 
+  @ApiProperty({ example: 'https://aws.tes', nullable: true })
+  @IsOptional()
+  avatar?: string;
+
   @ApiProperty({ required: false })
   @IsValid()
   @IsOptional()
