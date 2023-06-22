@@ -3,20 +3,24 @@ import * as crypto from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as path from 'path';
 import { AdminCreateUserDto } from 'src/users/dto/admin-create-user.dto';
+import { IEmailService } from './email.interface';
 
 @Injectable()
-export class EmailService {
-  constructor(private mailerService: MailerService) {}
+export class EmailService implements IEmailService {
+  private host: string;
+  constructor(private mailerService: MailerService) {
+    this.host = process.env.BASE_FRONT_URL;
+  }
 
-  async sendEmail(user: AdminCreateUserDto, template: string) {
-    user.partial_token = user.partial_token ?? crypto.randomBytes(32).toString('hex');
+  async sendEmail(userData: AdminCreateUserDto, template: string): Promise<void> {
+    userData.partial_token = userData.partial_token ?? crypto.randomBytes(32).toString('hex');
     const mail = {
-      to: user.email,
+      to: userData.email,
       subject: template,
       template: path.resolve(__dirname, '..', '..', `templates/${template}.hbs`),
       context: {
-        token: user.partial_token,
-        host: process.env.BASE_FRONT_URL,
+        token: userData.partial_token,
+        host: this.host,
       },
       attachments: [
         {

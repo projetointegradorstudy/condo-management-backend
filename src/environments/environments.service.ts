@@ -5,7 +5,8 @@ import { Environment } from './entities/environment.entity';
 import { IEnvironmentService } from './interfaces/environments.service';
 import { Status, isComplianceStatus, validateStatus } from './entities/status.enum';
 import { IEnvironmentRepository } from './interfaces/environments.repository';
-import { S3Service } from 'src/utils/s3.service';
+import { S3Service } from 'src/utils/upload/s3.service';
+import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
 
 @Injectable()
 export class EnvironmentsService implements IEnvironmentService {
@@ -14,7 +15,7 @@ export class EnvironmentsService implements IEnvironmentService {
     private readonly s3Service: S3Service,
   ) {}
 
-  async create(createEnvironmentDto: CreateEnvironmentDto, image?: Express.Multer.File) {
+  async create(createEnvironmentDto: CreateEnvironmentDto, image?: Express.Multer.File): Promise<Environment> {
     if (image) {
       const imageUploaded = await this.s3Service.uploadFile(image);
       createEnvironmentDto['image'] = imageUploaded.Location;
@@ -22,7 +23,7 @@ export class EnvironmentsService implements IEnvironmentService {
     return await this.environmentRepository.create(createEnvironmentDto);
   }
 
-  async count() {
+  async count(): Promise<number> {
     return await this.environmentRepository.count();
   }
 
@@ -38,7 +39,7 @@ export class EnvironmentsService implements IEnvironmentService {
     return environment;
   }
 
-  async findEnvRequestsById(id: string) {
+  async findEnvRequestsById(id: string): Promise<EnvRequest[]> {
     const environment = await this.environmentRepository.findBy({ where: { id }, relations: ['env_requests'] });
     if (!environment) throw new NotFoundException();
     return environment.env_requests;
@@ -64,7 +65,7 @@ export class EnvironmentsService implements IEnvironmentService {
     return await this.environmentRepository.update({ id }, updateEnvironmentDto);
   }
 
-  async remove(id: string): Promise<any> {
+  async remove(id: string): Promise<{ message: string }> {
     const environment = await this.environmentRepository.findBy({ where: { id } });
     if (!environment) throw new NotFoundException();
     await this.environmentRepository.softDelete(environment.id);

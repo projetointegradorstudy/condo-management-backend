@@ -4,14 +4,17 @@ import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { UsersRepository } from './users.repository';
-import { EmailService } from 'src/utils/email.service';
+import { EmailService } from 'src/utils/email/email.service';
 import { CheckUUIDParam, EmailExists, PasswordsMatch } from 'src/utils/validations.middleware';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { IUserService } from './interfaces/users.service';
 import { IUserRepository } from './interfaces/users.repository';
-import { S3Service } from 'src/utils/s3.service';
+import { S3Service } from 'src/utils/upload/s3.service';
+import { IS3Service } from 'src/utils/upload/s3.interface';
+import { IEmailService } from 'src/utils/email/email.interface';
+import { IAuthService } from 'src/auth/interfaces/auth.service';
 
 @Module({
   imports: [
@@ -36,9 +39,18 @@ import { S3Service } from 'src/utils/s3.service';
       provide: IUserRepository,
       useClass: UsersRepository,
     },
-    EmailService,
-    S3Service,
-    AuthService,
+    {
+      provide: IS3Service,
+      useClass: S3Service,
+    },
+    {
+      provide: IEmailService,
+      useClass: EmailService,
+    },
+    {
+      provide: IAuthService,
+      useClass: AuthService,
+    },
     UsersService,
   ],
   exports: [UsersService],

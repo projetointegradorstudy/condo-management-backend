@@ -1,10 +1,18 @@
-import { BadRequestException, ConflictException, HttpException, Injectable, NestMiddleware } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  HttpException,
+  Inject,
+  Injectable,
+  NestMiddleware,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { isUUID } from 'class-validator';
 import { Request, Response, NextFunction } from 'express';
 import { Repository } from 'typeorm';
-import { EmailService } from './email.service';
+import { EmailService } from './email/email.service';
 import { User } from 'src/users/entities/user.entity';
+import { IEmailService } from './email/email.interface';
 
 function checkUUID(field: string): void {
   if (!isUUID(field)) throw new HttpException({ error: `Must be a valid UUID` }, 400);
@@ -40,7 +48,7 @@ export class PasswordsMatch implements NestMiddleware {
 export class EmailExists implements NestMiddleware {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    private readonly emailService: EmailService,
+    @Inject(IEmailService) private readonly emailService: EmailService,
   ) {}
   async use(req: Request, _res: Response, next: NextFunction) {
     if (req.body.email) {
