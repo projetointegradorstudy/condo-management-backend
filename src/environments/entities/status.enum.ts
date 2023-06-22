@@ -5,7 +5,7 @@ export enum Status {
   DISABLED = 'disabled',
 }
 
-export function validateStatus(status: string): boolean {
+export function validateStatus(status?: string): boolean {
   if (status) {
     return Object.values(Status).includes(status as Status);
   }

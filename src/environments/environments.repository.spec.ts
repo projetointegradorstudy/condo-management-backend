@@ -3,6 +3,8 @@ import { Repository } from 'typeorm';
 import { Environment } from './entities/environment.entity';
 import { Status } from './entities/status.enum';
 import { BaseRepository } from 'src/base-entity/base-entity.repository';
+import { CreateEnvironmentDto } from './dto/create-environment.dto';
+import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 
 describe('EnvironmentRepository', () => {
   class MockEnvironmentRepository extends BaseRepository<Environment> {
@@ -10,11 +12,12 @@ describe('EnvironmentRepository', () => {
       const mockRepository = {} as Repository<Environment>;
       super(mockRepository);
     }
-
+    count = jest.fn();
     create = jest.fn();
     save = jest.fn();
-    findOneBy = jest.fn();
     find = jest.fn();
+    findOne = jest.fn();
+    findOneBy = jest.fn();
     update = jest.fn();
     softDelete = jest.fn();
   }
@@ -27,109 +30,58 @@ describe('EnvironmentRepository', () => {
     environmentRepository = new EnvironmentRepository(mockEnvironmentRepository as unknown as Repository<Environment>);
   });
 
-  describe('createEnvironment', () => {
+  describe('When create environment', () => {
     it('should create and save a new environment', async () => {
-      const createEnvironmentDto: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
+      const createEnvironmentDto: CreateEnvironmentDto = {
+        name: 'name test',
+        description: 'description test',
         capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
       };
       const createdEnvironment: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        name: 'name test',
+        description: 'description test',
+        status: Status.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
+        env_requests: [],
       };
 
-      mockEnvironmentRepository.create.mockReturnValue(createEnvironmentDto);
+      mockEnvironmentRepository.create.mockReturnValue(createdEnvironment);
       mockEnvironmentRepository.save.mockResolvedValue(createdEnvironment);
 
       const result = await environmentRepository.create(createEnvironmentDto);
 
       expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(createEnvironmentDto);
-      expect(mockEnvironmentRepository.save).toHaveBeenCalledWith(createEnvironmentDto);
+      expect(mockEnvironmentRepository.save).toHaveBeenCalledWith(createdEnvironment);
       expect(result).toEqual(createdEnvironment);
     });
   });
 
-  describe('findById', () => {
-    it('should find an environment by id', async () => {
-      const id = '12345';
-      const foundEnvironment: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-      mockEnvironmentRepository.findOneBy.mockResolvedValue(foundEnvironment);
+  describe('When count environments', () => {
+    it('should count and bring the total', async () => {
+      mockEnvironmentRepository.count.mockResolvedValue(5);
 
-      const result = await environmentRepository.findBy({ id });
+      const result = await environmentRepository.count();
 
-      expect(mockEnvironmentRepository.findOneBy).toHaveBeenCalledWith({ id });
-      expect(result).toEqual(foundEnvironment);
+      expect(mockEnvironmentRepository.count).toHaveBeenCalled();
+      expect(result).toEqual(5);
     });
   });
 
-  describe('updateEnvironment', () => {
-    it('should update and return an environment', async () => {
-      const id = '12345';
-      const updateEnvironmentDto: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-      const updatedEnvironment: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
-
-      mockEnvironmentRepository.create.mockReturnValue(updateEnvironmentDto);
-      mockEnvironmentRepository.update.mockResolvedValue(undefined);
-      mockEnvironmentRepository.findOneBy.mockResolvedValue(updatedEnvironment);
-
-      const result = await environmentRepository.update({ id }, updateEnvironmentDto);
-
-      expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(updateEnvironmentDto);
-      expect(mockEnvironmentRepository.update).toHaveBeenCalledWith({ id }, updateEnvironmentDto);
-      expect(mockEnvironmentRepository.findOneBy).toHaveBeenCalledWith({ id });
-      expect(result).toEqual(updatedEnvironment);
-    });
-  });
-
-  describe('findEnvironments', () => {
-    it('should find environments by status', async () => {
+  describe('When search for all environments', () => {
+    it('should find all environments by specific status', async () => {
       const status = Status.AVAILABLE;
-
       const foundEnvironments: Environment[] = [
         {
-          id: '1',
+          id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
           name: 'Environment 1',
           status: Status.AVAILABLE,
           capacity: 4,
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
-        },
-        {
-          id: '2',
-          name: 'Environment 2',
-          status: Status.AVAILABLE,
-          capacity: 4,
-          created_at: new Date(Date.now()),
-          updated_at: new Date(Date.now()),
+          env_requests: [],
         },
       ];
 
@@ -141,23 +93,25 @@ describe('EnvironmentRepository', () => {
       expect(result).toEqual(foundEnvironments);
     });
 
-    it('should find all environments when status is not provided', async () => {
+    it('should find all environments', async () => {
       const foundEnvironments: Environment[] = [
         {
-          id: '1',
+          id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
           name: 'Environment 1',
           status: Status.AVAILABLE,
           capacity: 4,
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
+          env_requests: [],
         },
         {
-          id: '2',
+          id: '681cedb1-0ecd-4ga5-2414-bee5746hcffd',
           name: 'Environment 2',
           status: Status.LOCKED,
           capacity: 4,
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
+          env_requests: [],
         },
       ];
 
@@ -167,6 +121,80 @@ describe('EnvironmentRepository', () => {
 
       expect(mockEnvironmentRepository.find).toHaveBeenCalled();
       expect(result).toEqual(foundEnvironments);
+    });
+  });
+
+  describe('When search one environment by ID', () => {
+    it('should find an environment', async () => {
+      const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const foundEnvironment: Environment = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        name: 'name test',
+        status: Status.DISABLED,
+        capacity: 4,
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+        env_requests: [],
+      };
+      mockEnvironmentRepository.findOne.mockResolvedValue(foundEnvironment);
+
+      const result = await environmentRepository.findBy({ where: { id } });
+
+      expect(mockEnvironmentRepository.findOne).toHaveBeenCalledWith({ where: { id } });
+      expect(result).toEqual(foundEnvironment);
+    });
+  });
+
+  describe('When update an environment', () => {
+    it('should apply changes and bring the updated environment', async () => {
+      const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const updateEnvironmentDto: UpdateEnvironmentDto = {
+        name: 'updated name',
+        description: 'updated description',
+      };
+      const updatedEnvironment: Environment = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        name: 'updated name',
+        description: 'updated description',
+        status: Status.DISABLED,
+        capacity: 4,
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+        env_requests: [],
+      };
+
+      mockEnvironmentRepository.create.mockReturnValue(updateEnvironmentDto);
+      mockEnvironmentRepository.findOneBy.mockResolvedValue(updatedEnvironment);
+
+      const result = await environmentRepository.update({ id }, updateEnvironmentDto);
+
+      expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(updateEnvironmentDto);
+      expect(mockEnvironmentRepository.update).toHaveBeenCalledWith({ id }, updateEnvironmentDto);
+      expect(mockEnvironmentRepository.findOneBy).toHaveBeenCalledWith({ id });
+      expect(result).toEqual(updatedEnvironment);
+    });
+  });
+
+  describe('When soft delete one environment by ID', () => {
+    it('should return soft deleted environment', async () => {
+      const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const softDeletedEnvironment: Environment = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        name: 'name test',
+        status: Status.DISABLED,
+        capacity: 4,
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+        deleted_at: new Date(Date.now()),
+        env_requests: [],
+      };
+
+      mockEnvironmentRepository.softDelete.mockResolvedValue(softDeletedEnvironment);
+
+      const result = await environmentRepository.softDelete(id);
+
+      expect(mockEnvironmentRepository.softDelete).toHaveBeenCalledWith(id);
+      expect(result).toEqual(softDeletedEnvironment);
     });
   });
 });

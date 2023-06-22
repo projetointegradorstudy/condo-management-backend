@@ -90,7 +90,9 @@
       "!**/*.module.(t|j)s",
       "!**/*.input.(t|j)s",
       "!**/*.entity.(t|j)s",
-      "!**/*.guard.(t|j)s"
+      "!**/*.guard.(t|j)s",
+      "!**/*.interface.(t|j)s",
+      "!**/*.enum.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
@@ -99,6 +101,8 @@
     },
     "modulePathIgnorePatterns": [
       "<rootDir>/db/",
+      "<rootDir>/config/",
+      "<rootDir>/utils/*.ts",
       "node_modules",
       "test-config",
       "interfaces",

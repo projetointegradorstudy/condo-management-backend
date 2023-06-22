@@ -22,7 +22,7 @@ import { Roles } from 'src/auth/roles/roles.decorator';
 import { Role } from 'src/auth/roles/role.enum';
 import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
 import { CreateUserPasswordDto } from './dto/create-user-password.dto';
-import { IUserService } from './interfaces/users.service';
+import { IUserService } from './interfaces/users-service.interface';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { FormData } from 'src/decorators/form-data.decorator';
 import { fileMimetypeFilter } from 'src/utils/file-mimetype-filter';

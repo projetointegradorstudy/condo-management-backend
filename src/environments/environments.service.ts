@@ -2,33 +2,34 @@ import { BadRequestException, Injectable, Inject, NotFoundException } from '@nes
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { Environment } from './entities/environment.entity';
-import { IEnvironmentService } from './interfaces/environments.service';
+import { IEnvironmentService } from './interfaces/environments-service.interface';
 import { Status, isComplianceStatus, validateStatus } from './entities/status.enum';
-import { IEnvironmentRepository } from './interfaces/environments.repository';
-import { S3Service } from 'src/utils/upload/s3.service';
+import { IEnvironmentRepository } from './interfaces/environments-repository.interface';
 import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { IS3Service } from 'src/utils/upload/s3.interface';
 
 @Injectable()
 export class EnvironmentsService implements IEnvironmentService {
   constructor(
     @Inject(IEnvironmentRepository) private readonly environmentRepository: IEnvironmentRepository,
-    private readonly s3Service: S3Service,
+    @Inject(IS3Service) private readonly s3Service: IS3Service,
   ) {}
 
-  async create(createEnvironmentDto: CreateEnvironmentDto, image?: Express.Multer.File): Promise<Environment> {
+  async create(createEnvironmentDto: CreateEnvironmentDto, image?: Express.Multer.File): Promise<{ message: string }> {
     if (image) {
       const imageUploaded = await this.s3Service.uploadFile(image);
       createEnvironmentDto['image'] = imageUploaded.Location;
     }
-    return await this.environmentRepository.create(createEnvironmentDto);
+    await this.environmentRepository.create(createEnvironmentDto);
+    return { message: 'Environment created successfully' };
   }
 
   async count(): Promise<number> {
     return await this.environmentRepository.count();
   }
 
-  async findAll(status: string): Promise<Environment[]> {
-    if (!validateStatus(status)) throw new BadRequestException({ message: 'invalid environments status' });
+  async findAll(status?: string): Promise<Environment[]> {
+    if (!validateStatus(status)) throw new BadRequestException({ message: 'invalid environment status' });
 
     return await this.environmentRepository.find({ where: { status: status as Status } });
   }
@@ -50,7 +51,8 @@ export class EnvironmentsService implements IEnvironmentService {
     updateEnvironmentDto: UpdateEnvironmentDto,
     image?: Express.Multer.File,
   ): Promise<Environment> {
-    const environment = await this.findOne(id);
+    const environment = await this.environmentRepository.findBy({ where: { id } });
+    if (!environment) throw new NotFoundException();
 
     const errorMessage = isComplianceStatus(updateEnvironmentDto.status, environment.status);
     if (errorMessage) {

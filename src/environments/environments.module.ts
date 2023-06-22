@@ -4,9 +4,10 @@ import { EnvironmentsController } from './environments.controller';
 import { Environment } from './entities/environment.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EnvironmentRepository } from './environments.repository';
-import { IEnvironmentService } from './interfaces/environments.service';
-import { IEnvironmentRepository } from './interfaces/environments.repository';
+import { IEnvironmentService } from './interfaces/environments-service.interface';
+import { IEnvironmentRepository } from './interfaces/environments-repository.interface';
 import { S3Service } from 'src/utils/upload/s3.service';
+import { IS3Service } from 'src/utils/upload/s3.interface';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Environment])],
@@ -20,7 +21,10 @@ import { S3Service } from 'src/utils/upload/s3.service';
       provide: IEnvironmentRepository,
       useClass: EnvironmentRepository,
     },
-    S3Service,
+    {
+      provide: IS3Service,
+      useClass: S3Service,
+    },
   ],
 })
 export class EnvironmentsModule {}

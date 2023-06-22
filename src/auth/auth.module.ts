@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { RolesGuard } from './roles/roles.guard';
-import { IAuthService } from './interfaces/auth.service';
+import { IAuthService } from './interfaces/auth-service.interface';
 
 @Module({
   imports: [

@@ -2,9 +2,9 @@ import { BadRequestException, Injectable, Inject, NotFoundException } from '@nes
 import { CreateEnvRequestDto } from './dto/create-env-request.dto';
 import { UpdateEnvRequestDto } from './dto/update-env-request.dto';
 import { EnvRequest } from './entities/env-request.entity';
-import { IEnvRequestService } from './interfaces/env-requests.service';
+import { IEnvRequestService } from './interfaces/env-requests-service.interface';
 import { EnvRequestStatus } from './entities/status.enum';
-import { IEnvRequestRepository } from './interfaces/env-requests.repository';
+import { IEnvRequestRepository } from './interfaces/env-requests-repository.interface';
 
 @Injectable()
 export class EnvRequestsService implements IEnvRequestService {

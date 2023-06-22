@@ -2,26 +2,24 @@ import { HttpException, Inject, Injectable, NotFoundException, forwardRef } from
 import { AdminCreateUserDto } from './dto/admin-create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
-import { IUserService } from './interfaces/users.service';
-import { IUserRepository } from './interfaces/users.repository';
-import { EmailService } from 'src/utils/email/email.service';
+import { IUserService } from './interfaces/users-service.interface';
+import { IUserRepository } from './interfaces/users-repository.interface';
 import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 import { AuthCredentialsDto } from 'src/auth/dto/auth-credentials.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { S3Service } from 'src/utils/upload/s3.service';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 import { User } from './entities/user.entity';
 import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
 import { IEmailService } from 'src/utils/email/email.interface';
-import { IAuthService } from 'src/auth/interfaces/auth.service';
+import { IAuthService } from 'src/auth/interfaces/auth-service.interface';
 
 @Injectable()
 export class UsersService implements IUserService {
   constructor(
     @Inject(IUserRepository) private readonly userRepository: IUserRepository,
-    @Inject(IS3Service) private readonly s3Service: S3Service,
-    @Inject(IEmailService) private readonly emailService: EmailService,
+    @Inject(IS3Service) private readonly s3Service: IS3Service,
+    @Inject(IEmailService) private readonly emailService: IEmailService,
     @Inject(forwardRef(() => IAuthService))
     private readonly authService: AuthService,
   ) {}

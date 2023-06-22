@@ -1,25 +1,37 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsMimeType, IsOptional, MaxLength } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateEnvironmentDto {
-  @ApiProperty({ example: 'Room' })
+  @ApiProperty({ example: 'Gym', description: 'Allows up to 50 characters' })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(50)
   name: string;
 
-  @ApiProperty({ example: 'Room', nullable: true })
-  @IsString()
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: false,
+    description: 'Allows .png, .jpg and jpeg - max size = 5MB',
+  })
+  @IsMimeType({ message: 'Must be .png, .jpg or .jpeg and should be up to 5MB' })
   @IsOptional()
+  image?: any;
+
+  @ApiProperty({
+    example: 'It is a well equipped place with the bests machine to exercise',
+    maxLength: 150,
+    description: 'Allows up to 150 characters',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(150)
   description: string;
 
-  @ApiProperty({ example: 'https://aws.tes', nullable: true })
-  @IsOptional()
-  image?: string;
-
-  @ApiProperty({ example: 50, default: 0, nullable: true })
+  @ApiProperty({ example: 50, default: 0 })
   @IsNumber()
-  @IsOptional()
+  @IsNotEmpty()
   @Transform((data) => +data.value)
   capacity: number;
 }

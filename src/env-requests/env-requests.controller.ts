@@ -17,7 +17,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { CreateEnvRequestDto } from './dto/create-env-request.dto';
-import { IEnvRequestService } from './interfaces/env-requests.service';
+import { IEnvRequestService } from './interfaces/env-requests-service.interface';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()

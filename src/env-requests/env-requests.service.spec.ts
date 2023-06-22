@@ -1,6 +1,6 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { EnvironmentsService } from './environments.service';
-import { IEnvironmentRepository } from './interfaces/env-requests.repository';
+import { IEnvironmentRepository } from './interfaces/env-requests-repository.interface';
 import { Environment } from './entities/env-request.entity';
 import { Status } from './entities/status.enum';
 import { UpdateEnvironmentDto } from './dto/update-env-request.dto';

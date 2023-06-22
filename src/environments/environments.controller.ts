@@ -14,8 +14,8 @@ import {
 } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
-import { IEnvironmentService } from './interfaces/environments.service';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { IEnvironmentService } from './interfaces/environments-service.interface';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { Roles } from 'src/auth/roles/roles.decorator';
@@ -37,31 +37,8 @@ export class EnvironmentsController {
     fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
     limits: { fileSize: 5242880 /** <- 5mb */ },
   })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['name', 'description', 'capacity'],
-      properties: {
-        image: {
-          description: 'Allows .png, .jpg and jpeg - max size = 5MB',
-          type: 'string',
-          format: 'binary',
-        },
-        name: {
-          description: 'Name to presentation',
-          type: 'string',
-        },
-        description: {
-          description: "Environment's description",
-          type: 'string',
-        },
-        capacity: {
-          description: "Environment's capacity",
-          type: 'number',
-        },
-      },
-    },
-  })
+  @ApiOperation({ summary: 'Create a new Environment' })
+  @ApiBody({ type: CreateEnvironmentDto })
   create(@Body() createEnvironmentDto: CreateEnvironmentDto, @UploadedFile(ParseFile) image?: Express.Multer.File) {
     return this.environmentsService.create(createEnvironmentDto, image);
   }

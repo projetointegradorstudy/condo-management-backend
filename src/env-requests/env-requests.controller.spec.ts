@@ -1,5 +1,5 @@
 import { EnvironmentsController } from './env-requests.controller';
-import { IEnvironmentService } from './interfaces/env-requests.service';
+import { IEnvironmentService } from './interfaces/env-requests-service.interface';
 import { CreateEnvironmentDto } from './dto/create-env-request.dto';
 import { UpdateEnvironmentDto } from './dto/update-env-request.dto';
 import { Environment } from './entities/env-request.entity';

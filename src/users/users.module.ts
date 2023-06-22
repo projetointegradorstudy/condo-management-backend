@@ -9,12 +9,12 @@ import { CheckUUIDParam, EmailExists, PasswordsMatch } from 'src/utils/validatio
 import { AuthService } from 'src/auth/auth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { IUserService } from './interfaces/users.service';
-import { IUserRepository } from './interfaces/users.repository';
+import { IUserService } from './interfaces/users-service.interface';
+import { IUserRepository } from './interfaces/users-repository.interface';
 import { S3Service } from 'src/utils/upload/s3.service';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 import { IEmailService } from 'src/utils/email/email.interface';
-import { IAuthService } from 'src/auth/interfaces/auth.service';
+import { IAuthService } from 'src/auth/interfaces/auth-service.interface';
 
 @Module({
   imports: [

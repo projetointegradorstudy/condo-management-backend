@@ -4,8 +4,8 @@ import { EnvRequestsController } from './env-requests.controller';
 import { EnvRequest } from './entities/env-request.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EnvRequestRepository } from './env-requests.repository';
-import { IEnvRequestService } from './interfaces/env-requests.service';
-import { IEnvRequestRepository } from './interfaces/env-requests.repository';
+import { IEnvRequestService } from './interfaces/env-requests-service.interface';
+import { IEnvRequestRepository } from './interfaces/env-requests-repository.interface';
 
 @Module({
   imports: [TypeOrmModule.forFeature([EnvRequest])],

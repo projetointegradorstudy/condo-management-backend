@@ -1,7 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EnvRequest } from './entities/env-request.entity';
-import { IEnvRequestRepository } from './interfaces/env-requests.repository';
+import { IEnvRequestRepository } from './interfaces/env-requests-repository.interface';
 import { Injectable } from '@nestjs/common';
 import { BaseRepository } from 'src/base-entity/base-entity.repository';
 
