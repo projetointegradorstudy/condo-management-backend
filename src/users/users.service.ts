@@ -4,71 +4,76 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { IUserService } from './interfaces/users.service';
 import { IUserRepository } from './interfaces/users.repository';
-import { EmailService } from 'src/utils/email.service';
+import { EmailService } from 'src/utils/email/email.service';
 import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 import { AuthCredentialsDto } from 'src/auth/dto/auth-credentials.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { S3Service } from 'src/utils/s3.service';
+import { S3Service } from 'src/utils/upload/s3.service';
+import { IS3Service } from 'src/utils/upload/s3.interface';
+import { User } from './entities/user.entity';
+import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { IEmailService } from 'src/utils/email/email.interface';
+import { IAuthService } from 'src/auth/interfaces/auth.service';
 
 @Injectable()
 export class UsersService implements IUserService {
   constructor(
     @Inject(IUserRepository) private readonly userRepository: IUserRepository,
-    private readonly emailService: EmailService,
-    private readonly s3Service: S3Service,
-    @Inject(forwardRef(() => AuthService))
+    @Inject(IS3Service) private readonly s3Service: S3Service,
+    @Inject(IEmailService) private readonly emailService: EmailService,
+    @Inject(forwardRef(() => IAuthService))
     private readonly authService: AuthService,
   ) {}
 
-  async create(adminCreateUserDto: AdminCreateUserDto) {
+  async create(adminCreateUserDto: AdminCreateUserDto): Promise<{ message: string }> {
     await this.emailService.sendEmail(adminCreateUserDto, 'Create-password');
     await this.userRepository.create(adminCreateUserDto);
     return { message: 'User created successfully' };
   }
 
-  async count() {
+  async count(): Promise<number> {
     return await this.userRepository.count();
   }
 
-  async findAll() {
+  async findAll(): Promise<User[]> {
     return await this.userRepository.find();
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<User> {
     const user = await this.userRepository.findBy({ where: { id } });
     if (!user) throw new NotFoundException();
     return user;
   }
 
-  async findEnvRequestsById(id: string) {
+  async findEnvRequestsById(id: string): Promise<EnvRequest[]> {
     const user = await this.userRepository.findBy({ where: { id }, relations: ['env_requests'] });
     if (!user) throw new NotFoundException();
     return user.env_requests;
   }
 
-  async findToLogin(email: string) {
+  async findToLogin(email: string): Promise<User> {
     return await this.userRepository.findWtCredencial(email);
   }
 
-  async findOneByToken(token: string) {
+  async findOneByToken(token: string): Promise<User> {
     const user = await this.userRepository.findBy({ where: { partial_token: token } });
     if (!user) throw new NotFoundException('Invalid token');
     return user;
   }
 
-  async findOneByEmail(email: string) {
+  async findOneByEmail(email: string): Promise<User> {
     const user = await this.userRepository.findBy({ where: { email } });
     if (!user) throw new NotFoundException('Email not found');
     return user;
   }
 
-  async updateByAdmin(id: string, adminUpdateUserDto: AdminUpdateUserDto) {
+  async updateByAdmin(id: string, adminUpdateUserDto: AdminUpdateUserDto): Promise<User> {
     await this.findOne(id);
     return await this.userRepository.update({ id }, adminUpdateUserDto);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto, image?: Express.Multer.File) {
+  async update(id: string, updateUserDto: UpdateUserDto, image?: Express.Multer.File): Promise<User> {
     const user = await this.findOne(id);
     if (image) {
       const imageUploaded = await this.s3Service.uploadFile(image, user.avatar);
@@ -77,7 +82,7 @@ export class UsersService implements IUserService {
     return await this.userRepository.update({ id }, updateUserDto);
   }
 
-  async createPassword(token: string, createUserPasswordDto: CreateUserPasswordDto) {
+  async createPassword(token: string, createUserPasswordDto: CreateUserPasswordDto): Promise<{ access_token: string }> {
     const user = await this.findOneByToken(token);
     createUserPasswordDto.partial_token = null;
     createUserPasswordDto.is_active = true;
@@ -86,7 +91,7 @@ export class UsersService implements IUserService {
     return await this.authService.login(auth);
   }
 
-  async sendResetPassEmail(email: string) {
+  async sendResetPassEmail(email: string): Promise<{ message: string }> {
     const user = await this.userRepository.findBy({ where: { email } });
     if (!user) throw new HttpException({ message: 'An email with recovery password instructions will be sent' }, 200);
     await this.emailService.sendEmail(user, 'Recover-password');
@@ -96,14 +101,14 @@ export class UsersService implements IUserService {
     };
   }
 
-  async resetPassword(token: string, resetPasswordDto: ResetPasswordDto) {
+  async resetPassword(token: string, resetPasswordDto: ResetPasswordDto): Promise<{ access_token: string }> {
     const user = await this.findOneByToken(token);
     await this.userRepository.update({ id: user.id }, { password: resetPasswordDto.password, partial_token: null });
     const auth: AuthCredentialsDto = { email: user.email, password: resetPasswordDto.password };
     return await this.authService.login(auth);
   }
 
-  async remove(id: string) {
+  async remove(id: string): Promise<{ message: string }> {
     await this.findOne(id);
     await this.userRepository.softDelete(id);
     return { message: 'User deleted successfully' };

@@ -4,9 +4,10 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { JwtPayload } from './jwt-payload.interface';
+import { IAuthService } from './interfaces/auth.service';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements IAuthService {
   constructor(
     @Inject(forwardRef(() => UsersService)) private usersService: UsersService,
     private jwtService: JwtService,
