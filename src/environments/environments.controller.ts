@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { IEnvironmentService } from './interfaces/environments-service.interface';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
@@ -23,6 +23,7 @@ import { Role } from 'src/auth/roles/role.enum';
 import { FormData } from 'src/decorators/form-data.decorator';
 import { fileMimetypeFilter } from 'src/utils/file-mimetype-filter';
 import { ParseFile } from 'src/utils/parse-file.pipe';
+import { Status } from './entities/status.enum';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
@@ -50,6 +51,12 @@ export class EnvironmentsController {
   }
 
   @Get()
+  @ApiQuery({
+    name: 'status',
+    enum: Status,
+    description: 'Environments status to find',
+    required: false,
+  })
   findAll(@Query('status') status?: string) {
     return this.environmentsService.findAll(status);
   }

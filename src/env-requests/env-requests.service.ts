@@ -32,7 +32,7 @@ export class EnvRequestsService implements IEnvRequestService {
     // if (!validateEnvRequestStatus(status)) throw new BadRequestException({ message: 'invalid environments status' });
 
     return await this.envRequestRepository.find({
-      where: { id: userId, status: status as EnvRequestStatus },
+      where: { user_id: userId, status: status as EnvRequestStatus },
       relations: ['user', 'environment'],
     });
   }
