@@ -1,163 +1,232 @@
-// import { EnvironmentRepository } from './environments.repository';
-// import { Repository } from 'typeorm';
-// import { Environment } from './entities/environment.entity';
-// import { Status } from './entities/status.enum';
+import { BaseRepository } from 'src/base-entity/base-entity.repository';
+import { User } from './entities/user.entity';
+import { Repository } from 'typeorm';
+import { UsersRepository } from './users.repository';
+import { AdminCreateUserDto } from './dto/admin-create-user.dto';
+import { Role } from 'src/auth/roles/role.enum';
 
-// describe('EnvironmentRepository', () => {
-//   let environmentRepository: EnvironmentRepository;
-//   let mockEnvironmentRepository: jest.Mocked<Repository<Environment>>;
+describe('UserRepository', () => {
+  class MockUserRepository extends BaseRepository<User> {
+    constructor() {
+      const mockRepository = {} as Repository<User>;
+      super(mockRepository);
+    }
+    count = jest.fn();
+    create = jest.fn();
+    save = jest.fn();
+    find = jest.fn();
+    findOne = jest.fn();
+    findOneBy = jest.fn();
+    findWtCredencial = jest.fn();
+    update = jest.fn();
+    softDelete = jest.fn();
+  }
 
-//   beforeEach(() => {
-//     mockEnvironmentRepository = {
-//       create: jest.fn(),
-//       save: jest.fn(),
-//       findOne: jest.fn(),
-//       find: jest.fn(),
-//       update: jest.fn(),
-//     } as unknown as jest.Mocked<Repository<Environment>>;
+  let userRepository: UsersRepository;
+  let mockUserRepository: MockUserRepository;
 
-//     environmentRepository = new EnvironmentRepository(mockEnvironmentRepository);
-//   });
+  beforeEach(() => {
+    mockUserRepository = new MockUserRepository();
+    userRepository = new UsersRepository(mockUserRepository as unknown as Repository<User>);
+  });
 
-//   describe('createEnvironment', () => {
-//     it('should create and save a new environment', async () => {
-//       const createEnvironmentDto: Environment = {
-//         id: '12345',
-//         name: 'Env Test',
-//         status: Status.AVAILABLE,
-//         capacity: 4,
-//         created_at: new Date(Date.now()),
-//         updated_at: new Date(Date.now()),
-//       };
-//       const createdEnvironment: Environment = {
-//         id: '12345',
-//         name: 'Env Test',
-//         status: Status.AVAILABLE,
-//         capacity: 4,
-//         created_at: new Date(Date.now()),
-//         updated_at: new Date(Date.now()),
-//       };
+  describe('When create user', () => {
+    it('should create and save a new user', async () => {
+      const createUserDto: AdminCreateUserDto = { email: 'teste@test.com' };
+      const createdUser: User = new User({
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        name: 'name test',
+        email: 'teste@test.com',
+        role: Role.USER,
+        is_active: true,
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+      });
 
-//       mockEnvironmentRepository.create.mockReturnValue(createEnvironmentDto);
-//       mockEnvironmentRepository.save.mockResolvedValue(createdEnvironment);
+      mockUserRepository.create.mockReturnValue(createdUser);
+      mockUserRepository.save.mockResolvedValue(createdUser);
 
-//       const result = await environmentRepository.createEnvironment(createEnvironmentDto);
+      const result = await userRepository.create(createUserDto);
 
-//       expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(createEnvironmentDto);
-//       expect(mockEnvironmentRepository.save).toHaveBeenCalledWith(createEnvironmentDto);
-//       expect(result).toEqual(createdEnvironment);
-//     });
-//   });
+      expect(mockUserRepository.create).toHaveBeenCalledWith(createUserDto);
+      expect(mockUserRepository.save).toHaveBeenCalledWith(createdUser);
+      expect(result).toEqual(createdUser);
+    });
+  });
 
-//   describe('findById', () => {
-//     it('should find an environment by id', async () => {
-//       const id = '12345';
-//       const foundEnvironment: Environment = {
-//         id: '12345',
-//         name: 'Env Test',
-//         status: Status.AVAILABLE,
-//         capacity: 4,
-//         created_at: new Date(Date.now()),
-//         updated_at: new Date(Date.now()),
-//       };
-//       mockEnvironmentRepository.findOne.mockResolvedValue(foundEnvironment);
+  describe('When search one user by email', () => {
+    it('should find an user', async () => {
+      const email = 'test@test.com';
+      const foundUser: User = new User({
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        name: 'name test',
+        email: 'teste@test.com',
+        role: Role.USER,
+        is_active: true,
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+      });
 
-//       const result = await environmentRepository.findById(id);
+      mockUserRepository.findOne.mockResolvedValue(foundUser);
 
-//       expect(mockEnvironmentRepository.findOne).toHaveBeenCalledWith({ where: { id } });
-//       expect(result).toEqual(foundEnvironment);
-//     });
-//   });
+      const result = await userRepository.findWtCredencial(email);
 
-//   describe('updateEnvironment', () => {
-//     it('should update and return an environment', async () => {
-//       const id = '12345';
-//       const updateEnvironmentDto: Environment = {
-//         id: '12345',
-//         name: 'Env Test',
-//         status: Status.AVAILABLE,
-//         capacity: 4,
-//         created_at: new Date(Date.now()),
-//         updated_at: new Date(Date.now()),
-//       };
-//       const updatedEnvironment: Environment = {
-//         id: '12345',
-//         name: 'Env Test',
-//         status: Status.AVAILABLE,
-//         capacity: 4,
-//         created_at: new Date(Date.now()),
-//         updated_at: new Date(Date.now()),
-//       };
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { email },
+        select: [
+          'id',
+          'avatar',
+          'name',
+          'email',
+          'password',
+          'role',
+          'is_active',
+          'partial_token',
+          'created_at',
+          'updated_at',
+          'deleted_at',
+        ],
+      });
+      expect(result).toEqual(foundUser);
+    });
+  });
 
-//       mockEnvironmentRepository.create.mockReturnValue(updateEnvironmentDto);
-//       mockEnvironmentRepository.update.mockResolvedValue(undefined);
-//       mockEnvironmentRepository.findOne.mockResolvedValue(updatedEnvironment);
+  // describe('When count users', () => {
+  //   it('should count and bring the total', async () => {
+  //     mockUserRepository.count.mockResolvedValue(5);
 
-//       const result = await environmentRepository.updateEnvironment(id, updateEnvironmentDto);
+  //     const result = await userRepository.count();
 
-//       expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(updateEnvironmentDto);
-//       expect(mockEnvironmentRepository.update).toHaveBeenCalledWith({ id }, updateEnvironmentDto);
-//       expect(mockEnvironmentRepository.findOne).toHaveBeenCalledWith({ where: { id } });
-//       expect(result).toEqual(updatedEnvironment);
-//     });
-//   });
-//   describe('findEnvironments', () => {
-//     it('should find environments by status', async () => {
-//       const status = Status.AVAILABLE;
+  //     expect(mockUserRepository.count).toHaveBeenCalled();
+  //     expect(result).toEqual(5);
+  //   });
+  // });
 
-//       const foundEnvironments: Environment[] = [
-//         {
-//           id: '1',
-//           name: 'Environment 1',
-//           status: Status.AVAILABLE,
-//           capacity: 4,
-//           created_at: new Date(Date.now()),
-//           updated_at: new Date(Date.now()),
-//         },
-//         {
-//           id: '2',
-//           name: 'Environment 2',
-//           status: Status.AVAILABLE,
-//           capacity: 4,
-//           created_at: new Date(Date.now()),
-//           updated_at: new Date(Date.now()),
-//         },
-//       ];
+  // describe('When search for all users', () => {
+  //   it('should find all users by specific status', async () => {
+  //     const status = Status.AVAILABLE;
+  //     const foundUsers: User[] = [
+  //       {
+  //         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+  //         name: 'User 1',
+  //         status: Status.AVAILABLE,
+  //         capacity: 4,
+  //         created_at: new Date(Date.now()),
+  //         updated_at: new Date(Date.now()),
+  //         env_requests: [],
+  //       },
+  //     ];
 
-//       mockEnvironmentRepository.find.mockResolvedValue(foundEnvironments);
+  //     mockUserRepository.find.mockResolvedValue(foundUsers);
 
-//       const result = await environmentRepository.findEnvironments(status);
+  //     const result = await userRepository.find({ where: { status } });
 
-//       expect(mockEnvironmentRepository.find).toHaveBeenCalledWith({ where: { status } });
-//       expect(result).toEqual(foundEnvironments);
-//     });
+  //     expect(mockUserRepository.find).toHaveBeenCalledWith({ where: { status } });
+  //     expect(result).toEqual(foundUsers);
+  //   });
 
-//     it('should find all environments when status is not provided', async () => {
-//       const foundEnvironments: Environment[] = [
-//         {
-//           id: '1',
-//           name: 'Environment 1',
-//           status: Status.AVAILABLE,
-//           capacity: 4,
-//           created_at: new Date(Date.now()),
-//           updated_at: new Date(Date.now()),
-//         },
-//         {
-//           id: '2',
-//           name: 'Environment 2',
-//           status: Status.LOCKED,
-//           capacity: 4,
-//           created_at: new Date(Date.now()),
-//           updated_at: new Date(Date.now()),
-//         },
-//       ];
+  //   it('should find all users', async () => {
+  //     const foundUsers: User[] = [
+  //       {
+  //         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+  //         name: 'User 1',
+  //         status: Status.AVAILABLE,
+  //         capacity: 4,
+  //         created_at: new Date(Date.now()),
+  //         updated_at: new Date(Date.now()),
+  //         env_requests: [],
+  //       },
+  //       {
+  //         id: '681cedb1-0ecd-4ga5-2414-bee5746hcffd',
+  //         name: 'User 2',
+  //         status: Status.LOCKED,
+  //         capacity: 4,
+  //         created_at: new Date(Date.now()),
+  //         updated_at: new Date(Date.now()),
+  //         env_requests: [],
+  //       },
+  //     ];
 
-//       mockEnvironmentRepository.find.mockResolvedValue(foundEnvironments);
+  //     mockUserRepository.find.mockResolvedValue(foundUsers);
 
-//       const result = await environmentRepository.findEnvironments(undefined);
+  //     const result = await userRepository.find();
 
-//       expect(mockEnvironmentRepository.find).toHaveBeenCalledWith();
-//       expect(result).toEqual(foundEnvironments);
-//     });
-//   });
-// });
+  //     expect(mockUserRepository.find).toHaveBeenCalled();
+  //     expect(result).toEqual(foundUsers);
+  //   });
+  // });
+
+  // describe('When search one user by ID', () => {
+  //   it('should find an user', async () => {
+  //     const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+  //     const foundUser: User = {
+  //       id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+  //       name: 'name test',
+  //       status: Status.DISABLED,
+  //       capacity: 4,
+  //       created_at: new Date(Date.now()),
+  //       updated_at: new Date(Date.now()),
+  //       env_requests: [],
+  //     };
+  //     mockUserRepository.findOne.mockResolvedValue(foundUser);
+
+  //     const result = await userRepository.findBy({ where: { id } });
+
+  //     expect(mockUserRepository.findOne).toHaveBeenCalledWith({ where: { id } });
+  //     expect(result).toEqual(foundUser);
+  //   });
+  // });
+
+  // describe('When update an user', () => {
+  //   it('should apply changes and bring the updated user', async () => {
+  //     const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+  //     const updateUserDto: UpdateUserDto = {
+  //       name: 'updated name',
+  //       description: 'updated description',
+  //     };
+  //     const updatedUser: User = {
+  //       id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+  //       name: 'updated name',
+  //       description: 'updated description',
+  //       status: Status.DISABLED,
+  //       capacity: 4,
+  //       created_at: new Date(Date.now()),
+  //       updated_at: new Date(Date.now()),
+  //       env_requests: [],
+  //     };
+
+  //     mockUserRepository.create.mockReturnValue(updateUserDto);
+  //     mockUserRepository.findOneBy.mockResolvedValue(updatedUser);
+
+  //     const result = await userRepository.update({ id }, updateUserDto);
+
+  //     expect(mockUserRepository.create).toHaveBeenCalledWith(updateUserDto);
+  //     expect(mockUserRepository.update).toHaveBeenCalledWith({ id }, updateUserDto);
+  //     expect(mockUserRepository.findOneBy).toHaveBeenCalledWith({ id });
+  //     expect(result).toEqual(updatedUser);
+  //   });
+  // });
+
+  // describe('When soft delete one user by ID', () => {
+  //   it('should return soft deleted user', async () => {
+  //     const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+  //     const softDeletedUser: User = {
+  //       id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+  //       name: 'name test',
+  //       status: Status.DISABLED,
+  //       capacity: 4,
+  //       created_at: new Date(Date.now()),
+  //       updated_at: new Date(Date.now()),
+  //       deleted_at: new Date(Date.now()),
+  //       env_requests: [],
+  //     };
+
+  //     mockUserRepository.softDelete.mockResolvedValue(softDeletedUser);
+
+  //     const result = await userRepository.softDelete(id);
+
+  //     expect(mockUserRepository.softDelete).toHaveBeenCalledWith(id);
+  //     expect(result).toEqual(softDeletedUser);
+  //   });
+  // });
+});

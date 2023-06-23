@@ -7,6 +7,8 @@ import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { createMockImage } from 'src/utils/upload/mocks/image.mock';
+import { EnvRequestStatus } from 'src/env-requests/entities/status.enum';
+import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
 
 describe('EnvironmentsService', () => {
   let environmentsService: EnvironmentsService;
@@ -15,6 +17,7 @@ describe('EnvironmentsService', () => {
 
   beforeEach(() => {
     mockEnvironmentRepository = {
+      count: jest.fn(),
       create: jest.fn(),
       find: jest.fn(),
       findBy: jest.fn(),
@@ -61,20 +64,21 @@ describe('EnvironmentsService', () => {
         description: 'description test',
         capacity: 4,
       };
-      const createdEnvironment: Environment = {
-        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-        name: 'name testt',
-        status: Status.DISABLED,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-        env_requests: [],
-      };
       const uploadedImage: AWS.S3.ManagedUpload.SendData = {
         Location: 'https://condo-tests.s3.amazonaws.com/attach-teste.png',
         Bucket: 'bucket-teste',
         Key: 'teste-image.png',
         ETag: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+      };
+      const createdEnvironment: Environment = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        name: 'name testt',
+        status: Status.DISABLED,
+        image: uploadedImage.Location,
+        capacity: 4,
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+        env_requests: [],
       };
 
       mockEnvironmentRepository.create.mockResolvedValue(createdEnvironment);
@@ -85,6 +89,17 @@ describe('EnvironmentsService', () => {
       expect(mockS3Service.uploadFile).toHaveBeenCalledWith(image);
       expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(createEnvironmentDto);
       expect(result).toEqual({ message: 'Environment created successfully' });
+    });
+  });
+
+  describe('When count environments', () => {
+    it('should return the total', async () => {
+      mockEnvironmentRepository.count.mockResolvedValue(5);
+
+      const result = await environmentsService.count();
+
+      expect(mockEnvironmentRepository.count).toHaveBeenCalled();
+      expect(result).toBe(5);
     });
   });
 
@@ -148,6 +163,50 @@ describe('EnvironmentsService', () => {
       await expect(environmentsService.findOne(id)).rejects.toThrowError(NotFoundException);
     });
   });
+
+  describe('When search env requests by environment ID', () => {
+    it("should return the environment's requests", async () => {
+      const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const foundEnvironmentRequests: EnvRequest[] = [
+        {
+          id: '5e00de71-b48b-41fd-b26c-687b02f27ef8',
+          status: EnvRequestStatus.PENDING,
+          user_id: 'f3fcdfdd-b7d6-4fce-b5c8-baf893ab946b',
+          environment_id: '2ed45c4d-d2cd-40eb-b213-587faf726287',
+          date_in: new Date(Date.now()),
+          date_out: new Date(Date.now()),
+          created_at: new Date(Date.now()),
+          updated_at: new Date(Date.now()),
+        },
+      ];
+      const existingEnvironment: Environment = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        name: 'test name',
+        description: 'test description',
+        status: Status.DISABLED,
+        capacity: 4,
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+        env_requests: foundEnvironmentRequests,
+      };
+
+      mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
+
+      const result = await environmentsService.findEnvRequestsById(id);
+
+      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ where: { id }, relations: ['env_requests'] });
+      expect(result).toEqual(foundEnvironmentRequests);
+    });
+
+    it('should throw NotFoundException when result is not found', async () => {
+      const id = 'invalid uuid';
+
+      mockEnvironmentRepository.findBy.mockResolvedValue(undefined);
+
+      await expect(environmentsService.findEnvRequestsById(id)).rejects.toThrowError(NotFoundException);
+    });
+  });
+
   describe('When update an environment', () => {
     it('should update an environment without image and return it', async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';

@@ -14,11 +14,22 @@ export class UsersRepository extends BaseRepository<User> implements IUserReposi
     super(usersRepository);
   }
 
-  async findWtCredencial(email: string) {
-    return await this.usersRepository
-      .createQueryBuilder('user')
-      .where(`user.email = '${email}'`)
-      .addSelect('user.password')
-      .getOne();
+  async findWtCredencial(email: string): Promise<User> {
+    return await this.usersRepository.findOne({
+      where: { email },
+      select: [
+        'id',
+        'avatar',
+        'name',
+        'email',
+        'password',
+        'role',
+        'is_active',
+        'partial_token',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+      ],
+    });
   }
 }
