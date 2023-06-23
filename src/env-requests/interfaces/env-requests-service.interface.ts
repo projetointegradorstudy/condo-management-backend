@@ -6,6 +6,7 @@ export interface IEnvRequestService {
   create(createEnvRequestDto: CreateEnvRequestDto, id: string): Promise<EnvRequest>;
   count(): Promise<number>;
   findAll(status: string): Promise<EnvRequest[]>;
+  findAllByUser(userId: string, status: string): Promise<EnvRequest[]>;
   findOne(id: string): Promise<EnvRequest>;
   update(id: string, updateEnvRequestDto: UpdateEnvRequestDto, image?: Express.Multer.File): Promise<EnvRequest>;
   remove(id: string): Promise<{ message: string }>;

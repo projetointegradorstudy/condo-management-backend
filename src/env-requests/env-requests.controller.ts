@@ -13,11 +13,13 @@ import {
   Req,
 } from '@nestjs/common';
 import { UpdateEnvRequestDto } from './dto/update-env-request.dto';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { CreateEnvRequestDto } from './dto/create-env-request.dto';
 import { IEnvRequestService } from './interfaces/env-requests-service.interface';
+import { Status } from 'src/environments/entities/status.enum';
+import { EnvRequestStatus } from './entities/status.enum';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
@@ -39,6 +41,17 @@ export class EnvRequestsController {
   @Get()
   findAll(@Query('status') status?: string) {
     return this.envRequestsService.findAll(status);
+  }
+
+  @Get('user')
+  @ApiQuery({
+    name: 'status',
+    enum: EnvRequestStatus,
+    description: 'Env requests status to find',
+    required: false,
+  })
+  findAllByUser(@Req() req: any, @Query('status') status?: string) {
+    return this.envRequestsService.findAllByUser(req.user.user.id, status);
   }
 
   @Get(':uuid')

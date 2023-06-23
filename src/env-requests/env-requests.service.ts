@@ -28,6 +28,15 @@ export class EnvRequestsService implements IEnvRequestService {
     });
   }
 
+  async findAllByUser(userId: string, status?: string): Promise<EnvRequest[]> {
+    // if (!validateEnvRequestStatus(status)) throw new BadRequestException({ message: 'invalid environments status' });
+
+    return await this.envRequestRepository.find({
+      where: { id: userId, status: status as EnvRequestStatus },
+      relations: ['user', 'environment'],
+    });
+  }
+
   async findOne(id: string): Promise<EnvRequest> {
     const environment = await this.envRequestRepository.findBy({
       where: { id },
