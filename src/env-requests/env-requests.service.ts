@@ -19,10 +19,13 @@ export class EnvRequestsService implements IEnvRequestService {
     return await this.envRequestRepository.count();
   }
 
-  async findAll(status: string): Promise<EnvRequest[]> {
+  async findAll(status?: string): Promise<EnvRequest[]> {
     // if (!validateEnvRequestStatus(status)) throw new BadRequestException({ message: 'invalid environments status' });
 
-    return await this.envRequestRepository.find({ where: { status: status as EnvRequestStatus } });
+    return await this.envRequestRepository.find({
+      where: { status: status as EnvRequestStatus },
+      relations: ['user', 'environment'],
+    });
   }
 
   async findOne(id: string): Promise<EnvRequest> {

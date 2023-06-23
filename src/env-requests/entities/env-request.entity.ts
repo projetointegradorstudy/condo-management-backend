@@ -53,9 +53,9 @@ export class EnvRequest {
 
   @ManyToOne(() => User, (user: User) => user.env_requests)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
-  user: User;
+  user?: User;
 
   @ManyToOne(() => Environment, (environment: Environment) => environment.env_requests)
   @JoinColumn({ name: 'environment_id', referencedColumnName: 'id' })
-  environment: Environment;
+  environment?: Environment;
 }

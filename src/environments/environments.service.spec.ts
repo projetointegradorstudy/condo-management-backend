@@ -6,7 +6,7 @@ import { Status } from './entities/status.enum';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
-import { createMockImage } from 'src/utils/upload/mocks/image-mock';
+import { createMockImage } from 'src/utils/upload/mocks/image.mock';
 
 describe('EnvironmentsService', () => {
   let environmentsService: EnvironmentsService;
@@ -29,7 +29,7 @@ describe('EnvironmentsService', () => {
     environmentsService = new EnvironmentsService(mockEnvironmentRepository, mockS3Service);
   });
 
-  describe('When create a environment', () => {
+  describe('When create an environment', () => {
     it('should create an environment without image', async () => {
       const createEnvironmentDto: CreateEnvironmentDto = {
         name: 'name test',

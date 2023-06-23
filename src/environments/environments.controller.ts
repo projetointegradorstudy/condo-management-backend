@@ -62,7 +62,7 @@ export class EnvironmentsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get(':uuid?/env-requests')
-  findUserRequests(@Param('uuid', ParseUUIDPipe) uuid: string) {
+  findEnvRequestsById(@Param('uuid', ParseUUIDPipe) uuid: string) {
     return this.environmentsService.findEnvRequestsById(uuid);
   }
 
