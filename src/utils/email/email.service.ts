@@ -17,7 +17,7 @@ export class EmailService implements IEmailService {
     const mail = {
       to: userData.email,
       subject: template,
-      template: path.resolve(__dirname, '..', '..', `templates/${template}.hbs`),
+      template: path.resolve(__dirname, '..', '..', '..', `templates/${template}.hbs`),
       context: {
         token: userData.partial_token,
         host: this.host,
@@ -25,7 +25,7 @@ export class EmailService implements IEmailService {
       attachments: [
         {
           filename: 'logo.png',
-          path: path.resolve(__dirname, '..', '..', 'templates/attachments/logo.png'),
+          path: path.resolve(__dirname, '..', '..', '..', 'templates/attachments/logo.png'),
           cid: 'logo',
         },
       ],
