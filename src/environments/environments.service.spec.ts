@@ -7,8 +7,8 @@ import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { createMockImage } from 'src/utils/upload/mocks/image.mock';
-import { EnvRequestStatus } from 'src/env-requests/entities/status.enum';
-import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { EnvReservationStatus } from 'src/env-reservations/entities/status.enum';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 
 describe('EnvironmentsService', () => {
   let environmentsService: EnvironmentsService;
@@ -167,10 +167,10 @@ describe('EnvironmentsService', () => {
   describe('When search env requests by environment ID', () => {
     it("should return the environment's requests", async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
-      const foundEnvironmentRequests: EnvRequest[] = [
+      const foundEnvironmentRequests: EnvReservation[] = [
         {
           id: '5e00de71-b48b-41fd-b26c-687b02f27ef8',
-          status: EnvRequestStatus.PENDING,
+          status: EnvReservationStatus.PENDING,
           user_id: 'f3fcdfdd-b7d6-4fce-b5c8-baf893ab946b',
           environment_id: '2ed45c4d-d2cd-40eb-b213-587faf726287',
           date_in: new Date(Date.now()),
@@ -192,7 +192,7 @@ describe('EnvironmentsService', () => {
 
       mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
 
-      const result = await environmentsService.findEnvRequestsById(id);
+      const result = await environmentsService.findEnvReservationsById(id);
 
       expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ where: { id }, relations: ['env_requests'] });
       expect(result).toEqual(foundEnvironmentRequests);
@@ -203,7 +203,7 @@ describe('EnvironmentsService', () => {
 
       mockEnvironmentRepository.findBy.mockResolvedValue(undefined);
 
-      await expect(environmentsService.findEnvRequestsById(id)).rejects.toThrowError(NotFoundException);
+      await expect(environmentsService.findEnvReservationsById(id)).rejects.toThrowError(NotFoundException);
     });
   });
 

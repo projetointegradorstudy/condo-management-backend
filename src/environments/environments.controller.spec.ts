@@ -4,8 +4,8 @@ import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { Environment } from './entities/environment.entity';
 import { Status } from './entities/status.enum';
-import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
-import { EnvRequestStatus } from 'src/env-requests/entities/status.enum';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
+import { EnvReservationStatus } from 'src/env-reservations/entities/status.enum';
 
 describe('EnvironmentsController', () => {
   let environmentsController: EnvironmentsController;
@@ -17,7 +17,7 @@ describe('EnvironmentsController', () => {
       create: jest.fn(),
       findAll: jest.fn(),
       findOne: jest.fn(),
-      findEnvRequestsById: jest.fn(),
+      findEnvReservationsById: jest.fn(),
       update: jest.fn(),
       remove: jest.fn(),
     } as unknown as jest.Mocked<IEnvironmentService>;
@@ -110,10 +110,10 @@ describe('EnvironmentsController', () => {
   describe('When search env requests by environment ID', () => {
     it("should return the environment's requests", async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
-      const foundEnvironmentRequests: EnvRequest[] = [
+      const foundEnvironmentRequests: EnvReservation[] = [
         {
           id: '5e00de71-b48b-41fd-b26c-687b02f27ef8',
-          status: EnvRequestStatus.PENDING,
+          status: EnvReservationStatus.PENDING,
           user_id: 'f3fcdfdd-b7d6-4fce-b5c8-baf893ab946b',
           environment_id: '2ed45c4d-d2cd-40eb-b213-587faf726287',
           date_in: new Date(Date.now()),
@@ -123,11 +123,11 @@ describe('EnvironmentsController', () => {
         },
       ];
 
-      mockEnvironmentService.findEnvRequestsById.mockResolvedValue(foundEnvironmentRequests);
+      mockEnvironmentService.findEnvReservationsById.mockResolvedValue(foundEnvironmentRequests);
 
-      const result = await environmentsController.findEnvRequestsById(id);
+      const result = await environmentsController.findEnvReservationsById(id);
 
-      expect(mockEnvironmentService.findEnvRequestsById).toHaveBeenCalledWith(id);
+      expect(mockEnvironmentService.findEnvReservationsById).toHaveBeenCalledWith(id);
       expect(result).toBe(foundEnvironmentRequests);
     });
   });

@@ -1,8 +1,8 @@
-import { EnvironmentsController } from './env-requests.controller';
-import { IEnvironmentService } from './interfaces/env-requests-service.interface';
-import { CreateEnvironmentDto } from './dto/create-env-request.dto';
-import { UpdateEnvironmentDto } from './dto/update-env-request.dto';
-import { Environment } from './entities/env-request.entity';
+import { EnvironmentsController } from './env-reservations.controller';
+import { IEnvironmentService } from './interfaces/env-reservations-service.interface';
+import { CreateEnvironmentDto } from './dto/create-env-reservations.dto';
+import { UpdateEnvironmentDto } from './dto/update-env-reservations.dto';
+import { Environment } from './entities/env-reservation.entity';
 import { Status } from './entities/status.enum';
 
 describe('EnvironmentsController', () => {

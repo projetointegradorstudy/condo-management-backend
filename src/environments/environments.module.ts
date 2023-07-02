@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { EnvironmentsService } from './environments.service';
 import { EnvironmentsController } from './environments.controller';
 import { Environment } from './entities/environment.entity';
@@ -8,6 +8,7 @@ import { IEnvironmentService } from './interfaces/environments-service.interface
 import { IEnvironmentRepository } from './interfaces/environments-repository.interface';
 import { S3Service } from 'src/utils/upload/s3.service';
 import { IS3Service } from 'src/utils/upload/s3.interface';
+import { ValidateEnvironmentStatus } from 'src/utils/validations.middleware';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Environment])],
@@ -27,4 +28,8 @@ import { IS3Service } from 'src/utils/upload/s3.interface';
     },
   ],
 })
-export class EnvironmentsModule {}
+export class EnvironmentsModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(ValidateEnvironmentStatus).forRoutes({ path: 'environments', method: RequestMethod.GET });
+  }
+}

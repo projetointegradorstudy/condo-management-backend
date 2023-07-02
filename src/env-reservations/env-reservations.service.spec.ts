@@ -1,9 +1,9 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { EnvironmentsService } from './environments.service';
-import { IEnvironmentRepository } from './interfaces/env-requests-repository.interface';
-import { Environment } from './entities/env-request.entity';
+import { IEnvironmentRepository } from './interfaces/env-reservations-repository.interface';
+import { Environment } from './entities/env-reservation.entity';
 import { Status } from './entities/status.enum';
-import { UpdateEnvironmentDto } from './dto/update-env-request.dto';
+import { UpdateEnvironmentDto } from './dto/update-env-reservations.dto';
 
 describe('EnvironmentsService', () => {
   let environmentsService: EnvironmentsService;

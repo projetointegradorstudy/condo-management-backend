@@ -59,10 +59,14 @@ export class UsersModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(PasswordsMatch)
-      .forRoutes({ path: 'users/:token/create-password', method: RequestMethod.PATCH })
+      .forRoutes(
+        { path: 'users/:token/create-password', method: RequestMethod.PATCH },
+        { path: 'users/myself/update', method: RequestMethod.PATCH },
+        { path: 'users/admin/:uuid/update', method: RequestMethod.PATCH },
+      )
       .apply(EmailExists)
       .forRoutes({ path: 'users', method: RequestMethod.POST })
       .apply(CheckUUIDParam)
-      .forRoutes({ path: 'users/:uuid?/env-requests', method: RequestMethod.PATCH });
+      .forRoutes({ path: 'users/:uuid?/env-reservations', method: RequestMethod.PATCH });
   }
 }

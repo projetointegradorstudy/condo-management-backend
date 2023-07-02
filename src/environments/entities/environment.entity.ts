@@ -8,8 +8,8 @@ import {
   DeleteDateColumn,
   OneToMany,
 } from 'typeorm';
-import { Status } from './status.enum';
-import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { EnvironmentStatus } from './status.enum';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 
 @Entity({ name: 'environment' })
 export class Environment {
@@ -25,9 +25,9 @@ export class Environment {
   @Column({ nullable: true })
   description?: string;
 
-  @ApiProperty({ type: 'enum', enum: Status, default: Status.DISABLED })
-  @Column({ type: 'enum', enum: Status, default: Status.DISABLED })
-  status: Status;
+  @ApiProperty({ type: 'enum', enum: EnvironmentStatus, default: EnvironmentStatus.DISABLED })
+  @Column({ type: 'enum', enum: EnvironmentStatus, default: EnvironmentStatus.DISABLED })
+  status: EnvironmentStatus;
 
   @ApiProperty({ nullable: true, example: 'https://aws.test' })
   @Column({ nullable: true })
@@ -49,6 +49,6 @@ export class Environment {
   @DeleteDateColumn({ nullable: true })
   deleted_at?: Date;
 
-  @OneToMany(() => EnvRequest, (envRequest: EnvRequest) => envRequest.environment)
-  env_requests: EnvRequest[];
+  @OneToMany(() => EnvReservation, (envRequest: EnvReservation) => envRequest.environment)
+  env_requests: EnvReservation[];
 }

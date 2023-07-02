@@ -14,7 +14,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Role } from 'src/auth/roles/role.enum';
-import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -62,8 +62,8 @@ export class User extends BaseEntity {
   @DeleteDateColumn({ nullable: true })
   deleted_at?: Date;
 
-  @OneToMany(() => EnvRequest, (envRequest: EnvRequest) => envRequest.user)
-  env_requests: EnvRequest[];
+  @OneToMany(() => EnvReservation, (envRequest: EnvReservation) => envRequest.user)
+  env_requests: EnvReservation[];
 
   @BeforeInsert()
   @BeforeUpdate()

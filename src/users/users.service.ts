@@ -10,7 +10,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 import { User } from './entities/user.entity';
-import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 import { IEmailService } from 'src/utils/email/email.interface';
 import { IAuthService } from 'src/auth/interfaces/auth-service.interface';
 
@@ -44,7 +44,7 @@ export class UsersService implements IUserService {
     return user;
   }
 
-  async findEnvRequestsById(id: string): Promise<EnvRequest[]> {
+  async findEnvReservationsById(id: string): Promise<EnvReservation[]> {
     const user = await this.userRepository.findBy({ where: { id }, relations: ['env_requests'] });
     if (!user) throw new NotFoundException();
     return user.env_requests;

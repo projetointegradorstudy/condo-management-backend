@@ -27,6 +27,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { FormData } from 'src/decorators/form-data.decorator';
 import { fileMimetypeFilter } from 'src/utils/file-mimetype-filter';
 import { ParseFile } from 'src/utils/parse-file.pipe';
+
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
@@ -73,9 +74,9 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Get(':uuid?/env-requests')
+  @Get(':uuid?/env-reservations')
   findUserRequests(@Req() req: any, @Param('uuid') uuid: string) {
-    return this.usersService.findEnvRequestsById(uuid || req.user.user.id);
+    return this.usersService.findEnvReservationsById(uuid || req.user.user.id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -93,30 +94,7 @@ export class UsersController {
     fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
     limits: { fileSize: 5242880 /** <- 5mb */ },
   })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        avatar: {
-          description: 'Allows .png, .jpg and jpeg - max size = 5MB',
-          type: 'string',
-          format: 'binary',
-        },
-        name: {
-          description: 'Name to presentation',
-          type: 'string',
-        },
-        password: {
-          description: 'New password, must have 10 character and at least one of each (A-Z, a-z, 0-9, !-@-$-*)',
-          type: 'string',
-        },
-        passwordConfirmation: {
-          description: 'Must be equal to password above',
-          type: 'string',
-        },
-      },
-    },
-  })
+  @ApiBody({ required: false, type: UpdateUserDto })
   update(@Req() req: any, @Body() updateUserDto: UpdateUserDto, @UploadedFile(ParseFile) image?: Express.Multer.File) {
     return this.usersService.update(req.user.user.id, updateUserDto, image);
   }

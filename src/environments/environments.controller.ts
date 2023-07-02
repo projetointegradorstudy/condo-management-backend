@@ -23,7 +23,7 @@ import { Role } from 'src/auth/roles/role.enum';
 import { FormData } from 'src/decorators/form-data.decorator';
 import { fileMimetypeFilter } from 'src/utils/file-mimetype-filter';
 import { ParseFile } from 'src/utils/parse-file.pipe';
-import { Status } from './entities/status.enum';
+import { EnvironmentStatus } from './entities/status.enum';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
@@ -53,7 +53,7 @@ export class EnvironmentsController {
   @Get()
   @ApiQuery({
     name: 'status',
-    enum: Status,
+    enum: EnvironmentStatus,
     description: 'Environments status to find',
     required: false,
   })
@@ -68,9 +68,9 @@ export class EnvironmentsController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Get(':uuid?/env-requests')
-  findEnvRequestsById(@Param('uuid', ParseUUIDPipe) uuid: string) {
-    return this.environmentsService.findEnvRequestsById(uuid);
+  @Get(':uuid?/env-reservations')
+  findEnvReservationsById(@Param('uuid', ParseUUIDPipe) uuid: string) {
+    return this.environmentsService.findEnvReservationsById(uuid);
   }
 
   @Roles(Role.ADMIN)

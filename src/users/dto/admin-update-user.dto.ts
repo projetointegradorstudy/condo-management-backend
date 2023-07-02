@@ -4,12 +4,16 @@ import { IsEnum, IsOptional, IsString, MinLength } from 'class-validator';
 import { IsValid } from 'src/decorators/validate.decorator';
 
 export class AdminUpdateUserDto {
-  @ApiProperty()
+  @ApiProperty({
+    required: false,
+    description: 'New password, must have 10 character of length and at least one of each (A-Z, a-z, 0-9, !-@-$-*)',
+    example: 'Abc3xamp!e',
+  })
   @IsValid()
   @IsOptional()
   password?: string;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Must be equal to the password', example: 'Abc3xamp!e', required: false })
   @IsString()
   @IsOptional()
   @MinLength(10)

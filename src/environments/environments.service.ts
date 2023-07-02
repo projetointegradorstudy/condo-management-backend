@@ -1,11 +1,11 @@
-import { BadRequestException, Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { Environment } from './entities/environment.entity';
 import { IEnvironmentService } from './interfaces/environments-service.interface';
-import { Status, isComplianceStatus, validateStatus } from './entities/status.enum';
+import { EnvironmentStatus } from './entities/status.enum';
 import { IEnvironmentRepository } from './interfaces/environments-repository.interface';
-import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 
 @Injectable()
@@ -29,9 +29,7 @@ export class EnvironmentsService implements IEnvironmentService {
   }
 
   async findAll(status?: string): Promise<Environment[]> {
-    if (!validateStatus(status)) throw new BadRequestException({ message: 'invalid environment status' });
-
-    return await this.environmentRepository.find({ where: { status: status as Status } });
+    return await this.environmentRepository.find({ where: { status: status as EnvironmentStatus } });
   }
 
   async findOne(id: string): Promise<Environment> {
@@ -40,7 +38,7 @@ export class EnvironmentsService implements IEnvironmentService {
     return environment;
   }
 
-  async findEnvRequestsById(id: string): Promise<EnvRequest[]> {
+  async findEnvReservationsById(id: string): Promise<EnvReservation[]> {
     const environment = await this.environmentRepository.findBy({ where: { id }, relations: ['env_requests'] });
     if (!environment) throw new NotFoundException();
     return environment.env_requests;
@@ -53,11 +51,6 @@ export class EnvironmentsService implements IEnvironmentService {
   ): Promise<Environment> {
     const environment = await this.environmentRepository.findBy({ where: { id } });
     if (!environment) throw new NotFoundException();
-
-    const errorMessage = isComplianceStatus(updateEnvironmentDto.status, environment.status);
-    if (errorMessage) {
-      throw new BadRequestException({ message: errorMessage });
-    }
 
     if (image) {
       const imageUploaded = await this.s3Service.uploadFile(image, environment.image);
@@ -72,5 +65,12 @@ export class EnvironmentsService implements IEnvironmentService {
     if (!environment) throw new NotFoundException();
     await this.environmentRepository.softDelete(environment.id);
     return { message: 'Environment deleted successfully' };
+  }
+
+  private async checkEnvironmentEnvironmentStatus(id: string): Promise<void> {
+    const environment = await this.environmentRepository.findBy({ where: { id } });
+    if (!environment) throw new NotFoundException();
+    if (!(environment.status === EnvironmentStatus.AVAILABLE))
+      throw new BadRequestException('Environment not available');
   }
 }

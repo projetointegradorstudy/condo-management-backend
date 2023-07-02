@@ -3,7 +3,7 @@ import { IsString, IsNotEmpty, IsNumber, IsMimeType, IsOptional, MaxLength } fro
 import { Transform } from 'class-transformer';
 
 export class CreateEnvironmentDto {
-  @ApiProperty({ example: 'Gym', description: 'Allows up to 50 characters' })
+  @ApiProperty({ example: 'Gym', maxLength: 50 })
   @IsString()
   @IsNotEmpty()
   @MaxLength(50)
@@ -22,7 +22,6 @@ export class CreateEnvironmentDto {
   @ApiProperty({
     example: 'It is a well equipped place with the bests machine to exercise',
     maxLength: 150,
-    description: 'Allows up to 150 characters',
   })
   @IsString()
   @IsNotEmpty()

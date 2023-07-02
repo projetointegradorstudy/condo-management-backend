@@ -2,7 +2,7 @@ import { applyDecorators, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer-options.interface';
 import { ApiBody, ApiConsumes } from '@nestjs/swagger';
-import { Status } from 'src/environments/entities/status.enum';
+import { EnvironmentStatus } from 'src/environments/entities/status.enum';
 const getEnumValues = (enumObject: any): string[] => {
   return Object.keys(enumObject).map((key) => enumObject[key]);
 };
@@ -32,7 +32,7 @@ export function FormData(fieldName: string[], required = false, localOptions?: M
           status: {
             description: "Environment's status",
             type: 'enum',
-            enum: getEnumValues(Status),
+            enum: getEnumValues(EnvironmentStatus),
           },
           capacity: {
             description: "Environment's capacity",
