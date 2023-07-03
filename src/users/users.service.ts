@@ -6,7 +6,6 @@ import { IUserService } from './interfaces/users-service.interface';
 import { IUserRepository } from './interfaces/users-repository.interface';
 import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 import { AuthCredentialsDto } from 'src/auth/dto/auth-credentials.dto';
-import { AuthService } from 'src/auth/auth.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 import { User } from './entities/user.entity';
@@ -21,7 +20,7 @@ export class UsersService implements IUserService {
     @Inject(IS3Service) private readonly s3Service: IS3Service,
     @Inject(IEmailService) private readonly emailService: IEmailService,
     @Inject(forwardRef(() => IAuthService))
-    private readonly authService: AuthService,
+    private readonly authService: IAuthService,
   ) {}
 
   async create(adminCreateUserDto: AdminCreateUserDto): Promise<{ message: string }> {

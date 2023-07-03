@@ -1,20 +1,29 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
+import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { IAuthService } from './interfaces/auth-service.interface';
 
 describe('AuthController', () => {
-  let controller: AuthController;
+  let authController: AuthController;
+  let mockAuthService: jest.Mocked<IAuthService>;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [AuthController],
-      providers: [AuthService],
-    }).compile();
+  beforeEach(() => {
+    mockAuthService = {
+      login: jest.fn(),
+    } as unknown as jest.Mocked<IAuthService>;
 
-    controller = module.get<AuthController>(AuthController);
+    authController = new AuthController(mockAuthService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  describe('When try to authenticate', () => {
+    it('should return an access token', async () => {
+      const credentials: AuthCredentialsDto = { email: 'john_doo@contoso.com', password: '123456' };
+
+      mockAuthService.login.mockResolvedValue({ access_token: 'g75sdg756sd4g68sd4g68' });
+
+      const result = await authController.login(credentials);
+
+      expect(mockAuthService.login).toHaveBeenCalledWith(credentials);
+      expect(result).toEqual({ access_token: 'g75sdg756sd4g68sd4g68' });
+    });
   });
 });

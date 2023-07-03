@@ -84,6 +84,7 @@ export class User extends BaseEntity {
     this.name = user && user.name;
     this.email = user && user.email;
     this.is_active = user && user.is_active;
+    this.password = user && user.password;
     this.role = user && user.role;
     this.created_at = user && user.created_at;
     this.updated_at = user && user.updated_at;
