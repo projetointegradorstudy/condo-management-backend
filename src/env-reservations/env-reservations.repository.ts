@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { EnvReservation } from './entities/env-reservation.entity';
 import { IEnvReservationRepository } from './interfaces/env-reservations-repository.interface';
 import { Injectable } from '@nestjs/common';
-import { BaseRepository } from 'src/base-entity/base-entity.repository';
+import { BaseRepository } from 'src/base/base.repository';
 
 @Injectable()
 export class EnvReservationRepository extends BaseRepository<EnvReservation> implements IEnvReservationRepository {

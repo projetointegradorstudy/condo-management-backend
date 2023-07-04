@@ -1,4 +1,4 @@
-import { DeepPartial, DeleteResult, FindManyOptions, FindOptionsWhere, FindOneOptions } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, FindOneOptions, UpdateResult } from 'typeorm';
 
 export interface IBaseRepository<T> {
   create(data: DeepPartial<T>): Promise<T>;
@@ -6,5 +6,5 @@ export interface IBaseRepository<T> {
   find(options?: FindManyOptions<T>): Promise<T[]>;
   findBy(where: FindOneOptions<T>): Promise<T>;
   update(id: FindOptionsWhere<T>, data: DeepPartial<T>): Promise<T>;
-  softDelete(id: string): Promise<DeleteResult>;
+  softDelete(id: string): Promise<UpdateResult>;
 }

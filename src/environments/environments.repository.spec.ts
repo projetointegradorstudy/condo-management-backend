@@ -2,7 +2,7 @@ import { EnvironmentRepository } from './environments.repository';
 import { Repository } from 'typeorm';
 import { Environment } from './entities/environment.entity';
 import { Status } from './entities/status.enum';
-import { BaseRepository } from 'src/base-entity/base-entity.repository';
+import { BaseRepository } from 'src/base/base.repository';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 

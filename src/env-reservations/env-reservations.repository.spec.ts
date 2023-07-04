@@ -2,7 +2,7 @@ import { EnvironmentRepository } from './env-reservations.repository';
 import { Repository } from 'typeorm';
 import { Environment } from './entities/env-reservation.entity';
 import { Status } from './entities/status.enum';
-import { BaseRepository } from 'src/base-entity/base-entity.repository';
+import { BaseRepository } from 'src/base/base.repository';
 
 describe('EnvironmentRepository', () => {
   class MockEnvironmentRepository extends BaseRepository<Environment> {
