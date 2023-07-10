@@ -1,12 +1,12 @@
 import { Repository, UpdateResult } from 'typeorm';
 import { BaseRepository } from './base.repository';
 
-describe('BaseRepository', () => {
-  class MockBaseRepository<T> extends BaseRepository<T> {
-    constructor(mockedEntity: Repository<T>) {
-      super(mockedEntity);
-    }
+export class MockBaseRepository<T> extends BaseRepository<T> {
+  constructor(mockedEntity: Repository<T>) {
+    super(mockedEntity);
   }
+}
+describe('BaseRepository', () => {
   let mockBaseRepository: MockBaseRepository<any>;
   let mockedEntityRepository: Repository<any>;
 

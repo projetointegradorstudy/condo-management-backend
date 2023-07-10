@@ -14,11 +14,11 @@ describe('AuthController', () => {
     authController = new AuthController(mockAuthService);
   });
 
-  describe('When try to authenticate', () => {
+  describe('login', () => {
     it('should return an access token', async () => {
       const credentials: AuthCredentialsDto = { email: 'john_doo@contoso.com', password: '123456' };
 
-      mockAuthService.login.mockResolvedValue({ access_token: 'g75sdg756sd4g68sd4g68' });
+      jest.spyOn(mockAuthService, 'login').mockResolvedValueOnce({ access_token: 'g75sdg756sd4g68sd4g68' });
 
       const result = await authController.login(credentials);
 

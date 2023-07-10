@@ -13,10 +13,11 @@ import { Between, In } from 'typeorm';
 export class EnvReservationsService implements IEnvReservationService {
   constructor(@Inject(IEnvReservationRepository) private readonly envRequestRepository: IEnvReservationRepository) {}
 
-  async create(createEnvReservationDto: CreateEnvReservationDto, id: string) {
+  async create(createEnvReservationDto: CreateEnvReservationDto, id: string): Promise<{ message: string }> {
     createEnvReservationDto['user_id'] = id;
     await this.checkEnvironmentAvailability(createEnvReservationDto);
-    return await this.envRequestRepository.create(createEnvReservationDto);
+    await this.envRequestRepository.create(createEnvReservationDto);
+    return { message: 'Env reservation created successfully' };
   }
 
   async count() {
@@ -62,9 +63,9 @@ export class EnvReservationsService implements IEnvReservationService {
   }
 
   async remove(id: string): Promise<any> {
-    const environment = await this.envRequestRepository.findBy({ where: { id } });
-    if (!environment) throw new NotFoundException();
-    await this.envRequestRepository.softDelete(environment.id);
+    const envReservation = await this.envRequestRepository.findBy({ where: { id } });
+    if (!envReservation) throw new NotFoundException();
+    await this.envRequestRepository.softDelete(envReservation.id);
     return { message: 'EnvReservation deleted successfully' };
   }
 

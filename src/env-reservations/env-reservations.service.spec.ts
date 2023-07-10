@@ -1,226 +1,279 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
-import { EnvironmentsService } from './environments.service';
-import { IEnvironmentRepository } from './interfaces/env-reservations-repository.interface';
-import { Environment } from './entities/env-reservation.entity';
-import { Status } from './entities/status.enum';
-import { UpdateEnvironmentDto } from './dto/update-env-reservations.dto';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { EnvReservationsService } from './env-reservations.service';
+import { UpdateEnvReservationDto } from './dto/update-env-reservations.dto';
+import { CreateEnvReservationDto } from './dto/create-env-reservations.dto';
+import { EnvReservationStatus } from 'src/env-reservations/entities/status.enum';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
+import { IEnvReservationRepository } from './interfaces/env-reservations-repository.interface';
+import { User } from 'src/users/entities/user.entity';
+import { Role } from 'src/auth/roles/role.enum';
 
-describe('EnvironmentsService', () => {
-  let environmentsService: EnvironmentsService;
-  let mockEnvironmentRepository: jest.Mocked<IEnvironmentRepository>;
+describe('envReservationsService', () => {
+  let envReservationsService: EnvReservationsService;
+  let mockEnvReservationRepository: jest.Mocked<IEnvReservationRepository>;
 
   beforeEach(() => {
-    mockEnvironmentRepository = {
+    mockEnvReservationRepository = {
+      count: jest.fn(),
       create: jest.fn(),
       find: jest.fn(),
       findBy: jest.fn(),
       update: jest.fn(),
       softDelete: jest.fn(),
-    } as unknown as jest.Mocked<IEnvironmentRepository>;
+      checkUserRole: jest.fn(),
+    } as unknown as jest.Mocked<IEnvReservationRepository>;
 
-    environmentsService = new EnvironmentsService(mockEnvironmentRepository);
+    envReservationsService = new EnvReservationsService(mockEnvReservationRepository);
   });
 
   describe('create', () => {
-    it('should create and return a new environment', async () => {
-      const createEnvironmentDto: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
-        capacity: 4,
+    it('should create an env reservation', async () => {
+      const user_id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const CreateEnvReservationDto: CreateEnvReservationDto = {
+        environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        date_in: '2023-06-08 21:50:38' as any,
+        date_out: '2023-06-08 21:50:38' as any,
+      };
+      const createdEnvReservation: EnvReservation = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        status: EnvReservationStatus.PENDING,
+        user_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        date_in: new Date(),
+        date_out: new Date(),
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
       };
-      const createdEnvironment: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
 
-      mockEnvironmentRepository.create.mockResolvedValue(createdEnvironment);
+      mockEnvReservationRepository.create.mockResolvedValue(createdEnvReservation);
 
-      const result = await environmentsService.create(createEnvironmentDto);
+      const result = await envReservationsService.create(CreateEnvReservationDto, user_id);
 
-      expect(mockEnvironmentRepository.create).toHaveBeenCalledWith(createEnvironmentDto);
-      expect(result).toEqual(createdEnvironment);
+      expect(mockEnvReservationRepository.create).toHaveBeenCalledWith(CreateEnvReservationDto);
+      expect(result).toEqual({ message: 'Env reservation created successfully' });
+    });
+  });
+
+  describe('count', () => {
+    it('should return the total', async () => {
+      mockEnvReservationRepository.count.mockResolvedValue(5);
+
+      const result = await envReservationsService.count();
+
+      expect(mockEnvReservationRepository.count).toHaveBeenCalled();
+      expect(result).toBe(5);
     });
   });
 
   describe('findAll', () => {
-    it('should call environmentRepository.findEnvironments with the provided status and return the environments', async () => {
-      const status = Status.AVAILABLE;
-
-      const environments: Environment[] = [
+    it('should find all env reservations by specific status', async () => {
+      const status = EnvReservationStatus.PENDING;
+      const envReservations: EnvReservation[] = [
         {
-          id: '1',
-          name: 'Environment 1',
-          status: Status.AVAILABLE,
-          capacity: 4,
-          created_at: new Date(Date.now()),
-          updated_at: new Date(Date.now()),
-        },
-        {
-          id: '2',
-          name: 'Environment 2',
-          status: Status.AVAILABLE,
-          capacity: 4,
+          id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+          environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+          status: EnvReservationStatus.PENDING,
+          user_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+          date_in: new Date(),
+          date_out: new Date(),
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
         },
       ];
 
-      mockEnvironmentRepository.find.mockResolvedValue(environments);
+      mockEnvReservationRepository.find.mockResolvedValue(envReservations);
 
-      const result = await environmentsService.findAll(status);
+      const result = await envReservationsService.findAll(status);
 
-      expect(mockEnvironmentRepository.find).toHaveBeenCalledWith({ where: { status } });
-      expect(result).toEqual(environments);
+      expect(mockEnvReservationRepository.find).toHaveBeenCalledWith({
+        where: { status: status as EnvReservationStatus },
+        relations: ['user', 'environment'],
+      });
+      expect(result).toEqual(envReservations);
     });
+  });
 
-    it('should throw BadRequestException when an invalid status is provided', async () => {
-      const invalidStatus = 'invalid';
+  describe('findAllByUser', () => {
+    it('should find all env reservations by specified user', async () => {
+      const status = EnvReservationStatus.PENDING;
+      const userId = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const envReservations: EnvReservation[] = [
+        {
+          id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+          environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+          status: EnvReservationStatus.PENDING,
+          user_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+          date_in: new Date(),
+          date_out: new Date(),
+          created_at: new Date(Date.now()),
+          updated_at: new Date(Date.now()),
+        },
+      ];
 
-      mockEnvironmentRepository.find.mockResolvedValue([]);
+      mockEnvReservationRepository.find.mockResolvedValue(envReservations);
 
-      await expect(environmentsService.findAll(invalidStatus)).rejects.toThrowError(BadRequestException);
-      expect(mockEnvironmentRepository.find).not.toHaveBeenCalled();
+      const result = await envReservationsService.findAllByUser(userId, status);
+
+      expect(mockEnvReservationRepository.find).toHaveBeenCalledWith({
+        where: { user_id: userId, status: status as EnvReservationStatus },
+        relations: ['user', 'environment'],
+      });
+      expect(result).toEqual(envReservations);
     });
   });
 
   describe('findOne', () => {
-    it('should return an existing environment', async () => {
-      const id = '12345';
-      const foundEnvironment: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
-        capacity: 4,
+    it('should throw NotFoundException when result is not found', async () => {
+      const id = 'invalid uuid';
+
+      mockEnvReservationRepository.findBy.mockResolvedValue(undefined);
+
+      await expect(envReservationsService.findOne(id)).rejects.toThrowError(NotFoundException);
+    });
+
+    it('should return an env reservation', async () => {
+      const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const foundEnvReservation: EnvReservation = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        status: EnvReservationStatus.PENDING,
+        user_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        date_in: new Date(),
+        date_out: new Date(),
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.findBy.mockResolvedValue(foundEnvironment);
+      mockEnvReservationRepository.findBy.mockResolvedValue(foundEnvReservation);
 
-      const result = await environmentsService.findOne(id);
+      const result = await envReservationsService.findOne(id);
 
-      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
-      expect(result).toEqual(foundEnvironment);
-    });
-
-    it('should throw NotFoundException when environment is not found', async () => {
-      const id = 'not found';
-
-      mockEnvironmentRepository.findBy.mockResolvedValue(undefined);
-
-      await expect(environmentsService.findOne(id)).rejects.toThrowError(NotFoundException);
+      expect(mockEnvReservationRepository.findBy).toHaveBeenCalledWith({
+        where: { id },
+        relations: ['user', 'environment'],
+      });
+      expect(result).toEqual(foundEnvReservation);
     });
   });
+
   describe('update', () => {
-    it('should update an environment', async () => {
-      const id = '123';
-      const existingEnvironment: Environment = {
-        id: '123',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
+    it('should throw NotFoundException when result is not found', async () => {
+      const id = 'invalid uuid';
+      const updateEnvReservationDto: UpdateEnvReservationDto = {
+        status: EnvReservationStatus.APPROVED,
       };
-      const updateEnvironmentDto: UpdateEnvironmentDto = {
-        name: 'Env Test',
-        status: Status.PENDING,
-        capacity: 4,
-      };
+      const user: Partial<User> = { id: '571cecb0-0dce-4fa0-8410-aee5646fcfed', role: Role.USER };
 
-      const updatedEnvironment: Environment = {
-        id: '123',
-        name: 'Env Test',
-        status: Status.PENDING,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-      };
+      mockEnvReservationRepository.findBy.mockResolvedValue(null);
 
-      mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
-      mockEnvironmentRepository.update.mockResolvedValue(updatedEnvironment);
-
-      const result = await environmentsService.update(id, updateEnvironmentDto);
-
-      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
-      expect(mockEnvironmentRepository.update).toHaveBeenCalledWith({ id }, updateEnvironmentDto);
-      expect(result).toEqual(updatedEnvironment);
+      await expect(envReservationsService.update(id, updateEnvReservationDto, user)).rejects.toThrowError(
+        NotFoundException,
+      );
+      expect(mockEnvReservationRepository.findBy).toHaveBeenCalledWith({
+        where: { id },
+        relations: ['user', 'environment'],
+      });
+      expect(mockEnvReservationRepository.update).not.toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if environment is not found', async () => {
-      const id = '123';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {
-        name: 'Env Test',
-        status: Status.AVAILABLE,
-        capacity: 4,
+    it('should throw ForbiddenException when result is forbidden', async () => {
+      const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const existingEnvReservation: EnvReservation = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        status: EnvReservationStatus.PENDING,
+        user_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        date_in: new Date(),
+        date_out: new Date(),
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
       };
+      const updateEnvReservationDto: UpdateEnvReservationDto = {
+        status: EnvReservationStatus.APPROVED,
+      };
+      const user: Partial<User> = { id: '571cecb0-0dce-4g56-8410-aee5646fcfed', role: Role.USER };
 
-      mockEnvironmentRepository.findBy.mockResolvedValue(null);
+      mockEnvReservationRepository.findBy.mockResolvedValue(existingEnvReservation);
 
-      await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
-      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
-      expect(mockEnvironmentRepository.update).not.toHaveBeenCalled();
+      await expect(envReservationsService.update(id, updateEnvReservationDto, user)).rejects.toThrowError(
+        ForbiddenException,
+      );
+      expect(mockEnvReservationRepository.update).not.toHaveBeenCalled();
     });
 
-    it('should throw BadRequestException for non-compliant status', async () => {
-      const id = '123';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {
-        name: 'Env Test',
-        status: Status.PENDING,
-        capacity: 4,
+    it('should update an env Reservation', async () => {
+      const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const existingEnvReservation: EnvReservation = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        status: EnvReservationStatus.PENDING,
+        user_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        date_in: new Date(),
+        date_out: new Date(),
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
       };
-      const existingEnvironment: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.LOCKED,
-        capacity: 4,
+      const updateEnvReservationDto: UpdateEnvReservationDto = {
+        status: EnvReservationStatus.APPROVED,
+      };
+
+      const updatedEnvReservation: EnvReservation = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        status: EnvReservationStatus.APPROVED,
+        user_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        date_in: new Date(),
+        date_out: new Date(),
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
+      const user: Partial<User> = { id: '571cecb0-0dce-4fa0-8410-aee5646fcfed', role: Role.USER };
 
-      await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(BadRequestException);
-      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
-      expect(mockEnvironmentRepository.update).not.toHaveBeenCalled();
+      mockEnvReservationRepository.findBy.mockResolvedValue(existingEnvReservation);
+      mockEnvReservationRepository.update.mockResolvedValue(updatedEnvReservation);
+
+      const result = await envReservationsService.update(id, updateEnvReservationDto, user);
+
+      expect(mockEnvReservationRepository.findBy).toHaveBeenCalledWith({
+        where: { id },
+        relations: ['user', 'environment'],
+      });
+      expect(mockEnvReservationRepository.update).toHaveBeenCalledWith({ id }, updateEnvReservationDto);
+      expect(result).toEqual(updatedEnvReservation);
     });
   });
 
   describe('remove', () => {
-    it('should remove an existing environment', async () => {
-      const id = '12345';
-      const environment: Environment = {
-        id: '12345',
-        name: 'Env Test',
-        status: Status.AVAILABLE,
-        capacity: 4,
+    it('should throw NotFoundException when result is not found', async () => {
+      const id = 'invalid uuid';
+
+      mockEnvReservationRepository.findBy.mockResolvedValue(undefined);
+
+      await expect(envReservationsService.remove(id)).rejects.toThrowError(NotFoundException);
+    });
+
+    it('should return a success message', async () => {
+      const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
+      const existingEnvReservation: EnvReservation = {
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        status: EnvReservationStatus.PENDING,
+        user_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        date_in: new Date(),
+        date_out: new Date(),
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
       };
 
-      mockEnvironmentRepository.findBy.mockResolvedValue(environment);
-      mockEnvironmentRepository.softDelete.mockResolvedValue(undefined);
+      mockEnvReservationRepository.findBy.mockResolvedValue(existingEnvReservation);
+      mockEnvReservationRepository.softDelete.mockResolvedValue(undefined);
 
-      const result = await environmentsService.remove(id);
+      const result = await envReservationsService.remove(id);
 
-      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ id });
-      expect(mockEnvironmentRepository.softDelete).toHaveBeenCalledWith(environment.id);
-      expect(result).toEqual({ message: 'Environment deleted successfully' });
-    });
-
-    it('should throw NotFoundException when environment is not found', async () => {
-      const id = 'not found';
-
-      mockEnvironmentRepository.findBy.mockResolvedValue(undefined);
-
-      await expect(environmentsService.remove(id)).rejects.toThrowError(NotFoundException);
+      expect(mockEnvReservationRepository.findBy).toHaveBeenCalledWith({ where: { id } });
+      expect(mockEnvReservationRepository.softDelete).toHaveBeenCalledWith(existingEnvReservation.id);
+      expect(result).toEqual({ message: 'EnvReservation deleted successfully' });
     });
   });
 });

@@ -67,7 +67,7 @@ export class EnvironmentsService implements IEnvironmentService {
     return { message: 'Environment deleted successfully' };
   }
 
-  private async checkEnvironmentEnvironmentStatus(id: string): Promise<void> {
+  private async checkEnvironmentStatus(id: string): Promise<void> {
     const environment = await this.environmentRepository.findBy({ where: { id } });
     if (!environment) throw new NotFoundException();
     if (!(environment.status === EnvironmentStatus.AVAILABLE))

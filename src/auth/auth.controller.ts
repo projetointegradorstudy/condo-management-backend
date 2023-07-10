@@ -15,7 +15,7 @@ export class AuthController {
   constructor(@Inject(IAuthService) private readonly authService: IAuthService) {}
 
   @Post()
-  @ApiOperation({ summary: 'User authentication' })
+  @ApiOperation({ summary: 'Login' })
   @ApiCreatedResponse({
     description: 'User authenticated successfully',
     schema: {

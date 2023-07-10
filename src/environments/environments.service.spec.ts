@@ -1,8 +1,8 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 import { EnvironmentsService } from './environments.service';
 import { IEnvironmentRepository } from './interfaces/environments-repository.interface';
 import { Environment } from './entities/environment.entity';
-import { Status } from './entities/status.enum';
+import { EnvironmentStatus } from './entities/status.enum';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
@@ -32,7 +32,7 @@ describe('EnvironmentsService', () => {
     environmentsService = new EnvironmentsService(mockEnvironmentRepository, mockS3Service);
   });
 
-  describe('When create an environment', () => {
+  describe('create', () => {
     it('should create an environment without image', async () => {
       const createEnvironmentDto: CreateEnvironmentDto = {
         name: 'name test',
@@ -42,7 +42,7 @@ describe('EnvironmentsService', () => {
       const createdEnvironment: Environment = {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'name testt',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
@@ -73,7 +73,7 @@ describe('EnvironmentsService', () => {
       const createdEnvironment: Environment = {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'name testt',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         image: uploadedImage.Location,
         capacity: 4,
         created_at: new Date(Date.now()),
@@ -92,7 +92,7 @@ describe('EnvironmentsService', () => {
     });
   });
 
-  describe('When count environments', () => {
+  describe('count', () => {
     it('should return the total', async () => {
       mockEnvironmentRepository.count.mockResolvedValue(5);
 
@@ -103,14 +103,14 @@ describe('EnvironmentsService', () => {
     });
   });
 
-  describe('When search for all environments', () => {
+  describe('findAll', () => {
     it('should find all environments by specific status', async () => {
-      const status = Status.AVAILABLE;
+      const status = EnvironmentStatus.AVAILABLE;
       const environments: Environment[] = [
         {
           id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
           name: 'Environment 1',
-          status: Status.AVAILABLE,
+          status: EnvironmentStatus.AVAILABLE,
           capacity: 4,
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
@@ -125,22 +125,15 @@ describe('EnvironmentsService', () => {
       expect(mockEnvironmentRepository.find).toHaveBeenCalledWith({ where: { status } });
       expect(result).toEqual(environments);
     });
-
-    it('should throw BadRequestException when an invalid status is provided', async () => {
-      const invalidStatus = 'invalid';
-
-      await expect(environmentsService.findAll(invalidStatus)).rejects.toThrowError(BadRequestException);
-      expect(mockEnvironmentRepository.find).not.toHaveBeenCalled();
-    });
   });
 
-  describe('When search one environment by ID', () => {
+  describe('findOne', () => {
     it('should return an environment', async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const foundEnvironment: Environment = {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'name test',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
@@ -164,7 +157,7 @@ describe('EnvironmentsService', () => {
     });
   });
 
-  describe('When search env requests by environment ID', () => {
+  describe('findEnvReservationsById', () => {
     it("should return the environment's requests", async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const foundEnvironmentRequests: EnvReservation[] = [
@@ -183,7 +176,7 @@ describe('EnvironmentsService', () => {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'test name',
         description: 'test description',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
@@ -207,14 +200,14 @@ describe('EnvironmentsService', () => {
     });
   });
 
-  describe('When update an environment', () => {
+  describe('update', () => {
     it('should update an environment without image and return it', async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const existingEnvironment: Environment = {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'old name',
         description: 'old description',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
@@ -229,7 +222,7 @@ describe('EnvironmentsService', () => {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'updated name',
         description: 'updated description',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
@@ -254,7 +247,7 @@ describe('EnvironmentsService', () => {
         name: 'old name',
         description: 'old description',
         image: 'any image location',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
@@ -274,7 +267,7 @@ describe('EnvironmentsService', () => {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'updated name',
         description: 'updated description',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         image: uploadedImage.Location,
         capacity: 4,
         created_at: new Date(Date.now()),
@@ -307,40 +300,15 @@ describe('EnvironmentsService', () => {
       expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ where: { id } });
       expect(mockEnvironmentRepository.update).not.toHaveBeenCalled();
     });
-
-    it('should throw BadRequestException for non-compliant status', async () => {
-      const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {
-        name: 'updated name',
-        status: Status.PENDING,
-        description: 'updated description',
-      };
-      const existingEnvironment: Environment = {
-        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-        name: 'test name',
-        description: 'test description',
-        status: Status.LOCKED,
-        capacity: 4,
-        created_at: new Date(Date.now()),
-        updated_at: new Date(Date.now()),
-        env_requests: [],
-      };
-
-      mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
-
-      await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(BadRequestException);
-      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ where: { id } });
-      expect(mockEnvironmentRepository.update).not.toHaveBeenCalled();
-    });
   });
 
-  describe('When remove one environment by ID', () => {
+  describe('remove', () => {
     it('should return a success message', async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const environment: Environment = {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'name test',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),

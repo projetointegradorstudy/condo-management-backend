@@ -3,7 +3,7 @@ import { IEnvironmentService } from './interfaces/environments-service.interface
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { Environment } from './entities/environment.entity';
-import { Status } from './entities/status.enum';
+import { EnvironmentStatus } from './entities/status.enum';
 import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 import { EnvReservationStatus } from 'src/env-reservations/entities/status.enum';
 
@@ -25,7 +25,7 @@ describe('EnvironmentsController', () => {
     environmentsController = new EnvironmentsController(mockEnvironmentService);
   });
 
-  describe('When create an environment', () => {
+  describe('create', () => {
     it('should create an environment', async () => {
       const createEnvironmentDto: CreateEnvironmentDto = {
         name: 'name test',
@@ -42,7 +42,7 @@ describe('EnvironmentsController', () => {
     });
   });
 
-  describe('When count environments', () => {
+  describe('count', () => {
     it('should return the total', async () => {
       mockEnvironmentService.count.mockResolvedValue(5);
 
@@ -53,13 +53,13 @@ describe('EnvironmentsController', () => {
     });
   });
 
-  describe('When search for all environments', () => {
+  describe('find', () => {
     it('should find all environments', async () => {
       const environments: Environment[] = [
         {
           id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
           name: 'Environment 1',
-          status: Status.AVAILABLE,
+          status: EnvironmentStatus.AVAILABLE,
           capacity: 4,
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
@@ -68,7 +68,7 @@ describe('EnvironmentsController', () => {
         {
           id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
           name: 'Environment 1',
-          status: Status.AVAILABLE,
+          status: EnvironmentStatus.AVAILABLE,
           capacity: 4,
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
@@ -85,13 +85,13 @@ describe('EnvironmentsController', () => {
     });
   });
 
-  describe('When search one environment by ID', () => {
+  describe('findOne', () => {
     it('should return the environment with the specified ID', async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const foundEnvironment: Environment = {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'name test',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
@@ -107,7 +107,7 @@ describe('EnvironmentsController', () => {
     });
   });
 
-  describe('When search env requests by environment ID', () => {
+  describe('findEnvReservationsById', () => {
     it("should return the environment's requests", async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const foundEnvironmentRequests: EnvReservation[] = [
@@ -132,7 +132,7 @@ describe('EnvironmentsController', () => {
     });
   });
 
-  describe('When update an environment by ID', () => {
+  describe('update', () => {
     it('should update the environment with the specified ID', async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const updateEnvironmentDto: UpdateEnvironmentDto = {
@@ -144,7 +144,7 @@ describe('EnvironmentsController', () => {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
         name: 'updated name',
         description: 'updated description',
-        status: Status.DISABLED,
+        status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
@@ -160,7 +160,7 @@ describe('EnvironmentsController', () => {
     });
   });
 
-  describe('When remove one environment by ID', () => {
+  describe('remove', () => {
     it('should remove the environment with the specified ID', async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
 

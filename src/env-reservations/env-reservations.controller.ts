@@ -66,9 +66,9 @@ export class EnvReservationsController {
 
   @Patch(':uuid')
   update(
-    @Req() req: any,
     @Body() @Param('uuid', ParseUUIDPipe) uuid: string,
     @Body() updateEnvironmentDto: UpdateEnvReservationDto,
+    @Req() req: any,
   ) {
     return this.envRequestsService.update(uuid, updateEnvironmentDto, req.user.user);
   }
