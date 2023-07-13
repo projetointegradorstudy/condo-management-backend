@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as path from 'path';
@@ -33,7 +33,7 @@ export class EmailService implements IEmailService {
     try {
       await this.mailerService.sendMail(mail);
     } catch (e) {
-      throw new HttpException({ error: `There are something wrong in email's smtp` }, 400);
+      throw new BadRequestException(`There are something wrong in email's smtp`);
     }
   }
 }
