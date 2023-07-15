@@ -51,7 +51,7 @@ export class EnvReservation {
   @DeleteDateColumn({ nullable: true })
   deleted_at?: Date;
 
-  @ManyToOne(() => User, (user: User) => user.env_requests)
+  @ManyToOne(() => User, (user: User) => user.env_reservations)
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user?: User;
 

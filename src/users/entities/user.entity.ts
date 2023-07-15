@@ -62,8 +62,8 @@ export class User extends BaseEntity {
   @DeleteDateColumn({ nullable: true })
   deleted_at?: Date;
 
-  @OneToMany(() => EnvReservation, (envRequest: EnvReservation) => envRequest.user)
-  env_requests: EnvReservation[];
+  @OneToMany(() => EnvReservation, (envReservation: EnvReservation) => envReservation.user)
+  env_reservations: EnvReservation[];
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -88,5 +88,6 @@ export class User extends BaseEntity {
     this.role = user && user.role;
     this.created_at = user && user.created_at;
     this.updated_at = user && user.updated_at;
+    this.env_reservations = user && user.env_reservations;
   }
 }

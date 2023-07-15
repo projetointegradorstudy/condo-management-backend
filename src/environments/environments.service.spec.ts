@@ -41,7 +41,7 @@ describe('EnvironmentsService', () => {
       };
       const createdEnvironment: Environment = {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-        name: 'name testt',
+        name: 'name test',
         status: EnvironmentStatus.DISABLED,
         capacity: 4,
         created_at: new Date(Date.now()),
@@ -201,6 +201,20 @@ describe('EnvironmentsService', () => {
   });
 
   describe('update', () => {
+    it('should throw NotFoundException when result is not found', async () => {
+      const id = 'invalid uuid';
+      const updateEnvironmentDto: UpdateEnvironmentDto = {
+        name: 'updated name',
+        description: 'updated description',
+      };
+
+      mockEnvironmentRepository.findBy.mockResolvedValue(null);
+
+      await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
+      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ where: { id } });
+      expect(mockEnvironmentRepository.update).not.toHaveBeenCalled();
+    });
+
     it('should update an environment without image and return it', async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const existingEnvironment: Environment = {
@@ -285,20 +299,6 @@ describe('EnvironmentsService', () => {
       expect(mockS3Service.uploadFile).toHaveBeenCalledWith(image, existingEnvironment.image);
       expect(mockEnvironmentRepository.update).toHaveBeenCalledWith({ id }, updateEnvironmentDto);
       expect(result).toEqual(updatedEnvironment);
-    });
-
-    it('should throw NotFoundException when result is not found', async () => {
-      const id = 'invalid uuid';
-      const updateEnvironmentDto: UpdateEnvironmentDto = {
-        name: 'updated name',
-        description: 'updated description',
-      };
-
-      mockEnvironmentRepository.findBy.mockResolvedValue(null);
-
-      await expect(environmentsService.update(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
-      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ where: { id } });
-      expect(mockEnvironmentRepository.update).not.toHaveBeenCalled();
     });
   });
 

@@ -44,9 +44,9 @@ export class UsersService implements IUserService {
   }
 
   async findEnvReservationsById(id: string): Promise<EnvReservation[]> {
-    const user = await this.userRepository.findBy({ where: { id }, relations: ['env_requests'] });
+    const user = await this.userRepository.findBy({ where: { id }, relations: ['env_reservations'] });
     if (!user) throw new NotFoundException();
-    return user.env_requests;
+    return user.env_reservations;
   }
 
   async findToLogin(email: string): Promise<User> {
@@ -66,12 +66,14 @@ export class UsersService implements IUserService {
   }
 
   async updateByAdmin(id: string, adminUpdateUserDto: AdminUpdateUserDto): Promise<User> {
-    await this.findOne(id);
+    const user = await this.userRepository.findBy({ where: { id } });
+    if (!user) throw new NotFoundException();
     return await this.userRepository.update({ id }, adminUpdateUserDto);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, image?: Express.Multer.File): Promise<User> {
-    const user = await this.findOne(id);
+    const user = await this.userRepository.findBy({ where: { id } });
+    if (!user) throw new NotFoundException();
     if (image) {
       const imageUploaded = await this.s3Service.uploadFile(image, user.avatar);
       updateUserDto['avatar'] = imageUploaded.Location;
@@ -106,7 +108,8 @@ export class UsersService implements IUserService {
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    await this.findOne(id);
+    const user = await this.userRepository.findBy({ where: { id } });
+    if (!user) throw new NotFoundException();
     await this.userRepository.softDelete(id);
     return { message: 'User deleted successfully' };
   }
