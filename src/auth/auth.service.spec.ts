@@ -6,16 +6,20 @@ import { User } from 'src/users/entities/user.entity';
 import { Role } from './roles/role.enum';
 import { UnauthorizedException } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
+import { IAuthService } from './interfaces/auth-service.interface';
 
 describe('AuthService', () => {
-  let authService: AuthService;
+  let authService: IAuthService;
   let userService: IUserService;
   let jwtService: JwtService;
 
   beforeEach(async () => {
     const moduleRef = await Test.createTestingModule({
       providers: [
-        AuthService,
+        {
+          provide: IAuthService,
+          useClass: AuthService,
+        },
         {
           provide: IUserService,
           useValue: {
@@ -31,7 +35,7 @@ describe('AuthService', () => {
       ],
     }).compile();
 
-    authService = moduleRef.get<AuthService>(AuthService);
+    authService = moduleRef.get<IAuthService>(IAuthService);
     userService = moduleRef.get<IUserService>(IUserService);
     jwtService = moduleRef.get<JwtService>(JwtService);
   });
