@@ -31,8 +31,8 @@ describe('envReservationsService', () => {
       const user_id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const CreateEnvReservationDto: CreateEnvReservationDto = {
         environment_id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-        date_in: '2023-06-08 21:50:38' as any,
-        date_out: '2023-06-08 21:50:38' as any,
+        date_in: new Date(),
+        date_out: new Date(),
       };
       const createdEnvReservation: EnvReservation = {
         id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',

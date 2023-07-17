@@ -75,7 +75,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @Get(':uuid?/env-reservations')
-  findUserRequests(@Req() req: any, @Param('uuid') uuid: string) {
+  findUserRequests(@Param('uuid') uuid: string, @Req() req: any) {
     return this.usersService.findEnvReservationsById(uuid || req.user.user.id);
   }
 

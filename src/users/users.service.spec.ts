@@ -14,7 +14,9 @@ import { Role } from 'src/auth/roles/role.enum';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { AuthCredentialsDto } from 'src/auth/dto/auth-credentials.dto';
 import { IUserService } from './interfaces/users-service.interface';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 
 describe('UsersService', () => {
   let usersService: IUserService;
@@ -24,7 +26,7 @@ describe('UsersService', () => {
   let authService: IAuthService;
 
   beforeEach(async () => {
-    const moduleRef = await Test.createTestingModule({
+    const moduleRef: TestingModule = await Test.createTestingModule({
       providers: [
         {
           provide: IUserService,
@@ -222,7 +224,7 @@ describe('UsersService', () => {
 
       jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce(undefined);
 
-      await expect(usersService.findOne(token)).rejects.toThrowError(NotFoundException);
+      await expect(usersService.findOneByToken(token)).rejects.toThrowError(NotFoundException);
     });
 
     it('should return an user by token', async () => {
@@ -310,13 +312,13 @@ describe('UsersService', () => {
 
   describe('update', () => {
     const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
-    const adminUpdateUserDto: AdminUpdateUserDto = {
+    const updateUserDto: UpdateUserDto = {
       password: 'newPassword',
     };
     it('should throw NotFoundException when result is not found', async () => {
       jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce(undefined);
 
-      await expect(usersService.updateByAdmin(id, adminUpdateUserDto)).rejects.toThrowError(NotFoundException);
+      await expect(usersService.update(id, updateUserDto)).rejects.toThrowError(NotFoundException);
     });
 
     it('should update and return an user with image', async () => {
@@ -417,7 +419,7 @@ describe('UsersService', () => {
       await expect(usersService.sendResetPassEmail(email)).rejects.toThrowError(HttpException);
     });
 
-    it('should update and return an user without image', async () => {
+    it('should update and return a success message', async () => {
       const template = 'Recover-password';
       const foundUser: User = new User({
         name: 'old name',
@@ -446,137 +448,64 @@ describe('UsersService', () => {
     });
   });
 
-  // describe('update', () => {
-  //   it('should update an user without image and return it', async () => {
-  //     const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
-  //     const existingEnvironment: User = {
-  //       id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-  //       name: 'old name',
-  //       description: 'old description',
-  //       status: EnvironmentStatus.DISABLED,
-  //       capacity: 4,
-  //       created_at: new Date(Date.now()),
-  //       updated_at: new Date(Date.now()),
-  //       env_requests: [],
-  //     };
-  //     const updateEnvironmentDto: UpdateEnvironmentDto = {
-  //       name: 'updated name',
-  //       description: 'updated description',
-  //     };
+  describe('resetPassword', () => {
+    const token = 'gdfgfdg41df65g4d6fg46df';
+    const resetPasswordDto: ResetPasswordDto = { password: 'newPassword', passwordConfirmation: 'newPassword' };
 
-  //     const updatedEnvironment: User = {
-  //       id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-  //       name: 'updated name',
-  //       description: 'updated description',
-  //       status: EnvironmentStatus.DISABLED,
-  //       capacity: 4,
-  //       created_at: new Date(Date.now()),
-  //       updated_at: new Date(Date.now()),
-  //       env_requests: [],
-  //     };
+    it('should update and return an access token', async () => {
+      const foundUser: User = new User({
+        name: 'old name',
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        email: 'test@test.com',
+        partial_token: 'dfdsfdsgdhihafs',
+        role: Role.USER,
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+      });
+      const auth: AuthCredentialsDto = { email: 'test@test.com', password: 'newPassword' };
 
-  //     userRepository.findBy.mockResolvedValue(existingEnvironment);
-  //     userRepository.update.mockResolvedValue(updatedEnvironment);
+      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce(foundUser);
+      jest.spyOn(userRepository, 'update').mockResolvedValueOnce(foundUser);
 
-  //     const result = await usersService.update(id, updateEnvironmentDto);
+      const result = await usersService.resetPassword(token, resetPasswordDto);
 
-  //     expect(userRepository.findBy).toHaveBeenCalledWith({ where: { id } });
-  //     expect(userRepository.update).toHaveBeenCalledWith({ id }, updateEnvironmentDto);
-  //     expect(result).toEqual(updatedEnvironment);
-  //   });
+      expect(userRepository.findBy).toHaveBeenCalledWith({ where: { partial_token: token } });
+      expect(userRepository.update).toHaveBeenCalledWith(
+        { id: foundUser.id },
+        { password: resetPasswordDto.password, partial_token: null },
+      );
+      expect(authService.login).toHaveBeenCalledWith(auth);
+      expect(result).toEqual({ access_token: 'g75sdg756sd4g68sd4g68' });
+    });
+  });
 
-  //   it('should update an user with image and return it', async () => {
-  //     const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
-  //     const image: Express.Multer.File = createMockImage();
-  //     const existingEnvironment: User = {
-  //       id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-  //       name: 'old name',
-  //       description: 'old description',
-  //       image: 'any image location',
-  //       status: EnvironmentStatus.DISABLED,
-  //       capacity: 4,
-  //       created_at: new Date(Date.now()),
-  //       updated_at: new Date(Date.now()),
-  //       env_requests: [],
-  //     };
-  //     const updateEnvironmentDto: UpdateEnvironmentDto = {
-  //       name: 'updated name',
-  //       description: 'updated description',
-  //     };
-  //     const uploadedImage: AWS.S3.ManagedUpload.SendData = {
-  //       Location: 'https://condo-tests.s3.amazonaws.com/attach-teste.png',
-  //       Bucket: 'bucket-teste',
-  //       Key: 'teste-image.png',
-  //       ETag: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-  //     };
-  //     const updatedEnvironment: User = {
-  //       id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-  //       name: 'updated name',
-  //       description: 'updated description',
-  //       status: EnvironmentStatus.DISABLED,
-  //       image: uploadedImage.Location,
-  //       capacity: 4,
-  //       created_at: new Date(Date.now()),
-  //       updated_at: new Date(Date.now()),
-  //       env_requests: [],
-  //     };
+  describe('remove', () => {
+    const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
 
-  //     userRepository.findBy.mockResolvedValue(existingEnvironment);
-  //     mockS3Service.uploadFile.mockResolvedValue(uploadedImage);
-  //     userRepository.update.mockResolvedValue(updatedEnvironment);
+    it('should throw not found exception when result is not found', async () => {
+      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce(undefined);
 
-  //     const result = await usersService.update(id, updateEnvironmentDto, image);
+      await expect(usersService.remove(id)).rejects.toThrowError(NotFoundException);
+    });
 
-  //     expect(userRepository.findBy).toHaveBeenCalledWith({ where: { id } });
-  //     expect(mockS3Service.uploadFile).toHaveBeenCalledWith(image, existingEnvironment.image);
-  //     expect(userRepository.update).toHaveBeenCalledWith({ id }, updateEnvironmentDto);
-  //     expect(result).toEqual(updatedEnvironment);
-  //   });
+    it('should soft delete and return a success message', async () => {
+      const foundUser: User = new User({
+        name: 'old name',
+        id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
+        email: 'test@test.com',
+        partial_token: 'dfdsfdsgdhihafs',
+        role: Role.USER,
+        created_at: new Date(Date.now()),
+        updated_at: new Date(Date.now()),
+      });
 
-  //   it('should throw NotFoundException when result is not found', async () => {
-  //     const id = 'invalid uuid';
-  //     const updateEnvironmentDto: UpdateEnvironmentDto = {
-  //       name: 'updated name',
-  //       description: 'updated description',
-  //     };
+      jest.spyOn(userRepository, 'findBy').mockResolvedValueOnce(foundUser);
 
-  //     userRepository.findBy.mockResolvedValue(null);
+      const result = await usersService.remove(id);
 
-  //     await expect(usersService.update(id, updateEnvironmentDto)).rejects.toThrowError(NotFoundException);
-  //     expect(userRepository.findBy).toHaveBeenCalledWith({ where: { id } });
-  //     expect(userRepository.update).not.toHaveBeenCalled();
-  //   });
-  // });
-
-  // describe('remove', () => {
-  //   it('should return a success message', async () => {
-  //     const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
-  //     const user: User = {
-  //       id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
-  //       name: 'name test',
-  //       status: EnvironmentStatus.DISABLED,
-  //       capacity: 4,
-  //       created_at: new Date(Date.now()),
-  //       updated_at: new Date(Date.now()),
-  //       env_requests: [],
-  //     };
-
-  //     userRepository.findBy.mockResolvedValue(user);
-  //     userRepository.softDelete.mockResolvedValue(undefined);
-
-  //     const result = await usersService.remove(id);
-
-  //     expect(userRepository.findBy).toHaveBeenCalledWith({ where: { id } });
-  //     expect(userRepository.softDelete).toHaveBeenCalledWith(user.id);
-  //     expect(result).toEqual({ message: 'User deleted successfully' });
-  //   });
-
-  //   it('should throw NotFoundException when result is not found', async () => {
-  //     const id = 'invalid uuid';
-
-  //     userRepository.findBy.mockResolvedValue(undefined);
-
-  //     await expect(usersService.remove(id)).rejects.toThrowError(NotFoundException);
-  //   });
-  // });
+      expect(userRepository.findBy).toHaveBeenCalledWith({ where: { id } });
+      expect(userRepository.softDelete).toHaveBeenCalledWith(id);
+      expect(result).toEqual({ message: 'User deleted successfully' });
+    });
+  });
 });
