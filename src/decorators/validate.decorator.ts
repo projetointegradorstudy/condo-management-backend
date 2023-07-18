@@ -28,7 +28,9 @@ export function IsValid(validationOptions?: ValidationOptions) {
           return true;
         },
         defaultMessage(args: ValidationArguments) {
-          return `${args.property} must be valid`;
+          return args.property === 'password'
+            ? 'Password must have 10 character of length and at least one of each (A-Z, a-z, 0-9, !-@-$-*)'
+            : 'Email must be valid';
         },
       },
     });

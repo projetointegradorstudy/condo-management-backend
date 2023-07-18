@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { MailerService } from '@nestjs-modules/mailer';
 import * as path from 'path';
@@ -17,7 +17,7 @@ export class EmailService implements IEmailService {
     const mail = {
       to: userData.email,
       subject: template,
-      template: path.resolve(__dirname, '..', '..', `templates/${template}.hbs`),
+      template: path.resolve(__dirname, '..', '..', '..', `templates/${template}.hbs`),
       context: {
         token: userData.partial_token,
         host: this.host,
@@ -25,7 +25,7 @@ export class EmailService implements IEmailService {
       attachments: [
         {
           filename: 'logo.png',
-          path: path.resolve(__dirname, '..', '..', 'templates/attachments/logo.png'),
+          path: path.resolve(__dirname, '..', '..', '..', 'templates/attachments/logo.png'),
           cid: 'logo',
         },
       ],
@@ -33,7 +33,7 @@ export class EmailService implements IEmailService {
     try {
       await this.mailerService.sendMail(mail);
     } catch (e) {
-      throw new HttpException({ error: `There are something wrong in email's smtp` }, 400);
+      throw new BadRequestException(`There are something wrong in email's smtp`);
     }
   }
 }

@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import * as crypto from 'crypto';
 import { IS3Service } from './s3.interface';
@@ -34,7 +34,7 @@ export class S3Service implements IS3Service {
       if (currentFileKey) await this.deleteFile(await this.getKeyFromUrl(currentFileKey));
       return await this.s3.upload(params).promise();
     } catch (e) {
-      throw new HttpException(e.response || { error: 'Something wrong on upload file' }, 400);
+      throw new BadRequestException(e.response || 'Something wrong on upload file');
     }
   }
 
@@ -43,7 +43,7 @@ export class S3Service implements IS3Service {
       await this.s3.deleteObject({ Bucket: this.bucket, Key: key }).promise();
       return { message: 'Deleted successfully' };
     } catch (e) {
-      throw new HttpException({ error: "Can't delete the file" }, 400);
+      throw new BadRequestException("Can't delete the file");
     }
   }
 

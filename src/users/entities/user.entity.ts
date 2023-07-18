@@ -14,7 +14,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Role } from 'src/auth/roles/role.enum';
-import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -62,8 +62,8 @@ export class User extends BaseEntity {
   @DeleteDateColumn({ nullable: true })
   deleted_at?: Date;
 
-  @OneToMany(() => EnvRequest, (envRequest: EnvRequest) => envRequest.user)
-  env_requests: EnvRequest[];
+  @OneToMany(() => EnvReservation, (envReservation: EnvReservation) => envReservation.user)
+  env_reservations: EnvReservation[];
 
   @BeforeInsert()
   @BeforeUpdate()
@@ -76,5 +76,18 @@ export class User extends BaseEntity {
       }
     };
     if (this.password) await encrypt('password');
+  }
+
+  constructor(user?: Partial<User>) {
+    super();
+    this.id = user && user.id;
+    this.name = user && user.name;
+    this.email = user && user.email;
+    this.is_active = user && user.is_active;
+    this.password = user && user.password;
+    this.role = user && user.role;
+    this.created_at = user && user.created_at;
+    this.updated_at = user && user.updated_at;
+    this.env_reservations = user && user.env_reservations;
   }
 }

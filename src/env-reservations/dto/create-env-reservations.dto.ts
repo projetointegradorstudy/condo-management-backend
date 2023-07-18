@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsUUID, IsDate } from 'class-validator';
 
-export class CreateEnvRequestDto {
+export class CreateEnvReservationDto {
   @ApiProperty({ type: 'uuid', example: '571cecb0-0dce-4fa0-8410-aee5646fcfed' })
   @IsUUID()
   @IsNotEmpty()

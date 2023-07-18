@@ -1,5 +1,5 @@
-import { DeepPartial, Repository, FindManyOptions, DeleteResult, FindOptionsWhere, FindOneOptions } from 'typeorm';
-import { IBaseRepository } from './base-entity.interface';
+import { DeepPartial, Repository, FindManyOptions, FindOptionsWhere, FindOneOptions, UpdateResult } from 'typeorm';
+import { IBaseRepository } from './base.interface';
 
 export class BaseRepository<T> implements IBaseRepository<T> {
   private entity: Repository<T>;
@@ -30,7 +30,7 @@ export class BaseRepository<T> implements IBaseRepository<T> {
     return this.entity.findOneBy(id);
   }
 
-  public async softDelete(id: string): Promise<DeleteResult> {
+  public async softDelete(id: string): Promise<UpdateResult> {
     return await this.entity.softDelete(id);
   }
 }

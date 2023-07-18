@@ -13,10 +13,12 @@ import { Repository } from 'typeorm';
 import { EmailService } from './email/email.service';
 import { User } from 'src/users/entities/user.entity';
 import { IEmailService } from './email/email.interface';
+import { EnvironmentStatus } from 'src/environments/entities/status.enum';
+import { EnvReservationStatus } from 'src/env-reservations/entities/status.enum';
 
-function checkUUID(field: string): void {
+const checkUUID = (field: string): void => {
   if (!isUUID(field)) throw new HttpException({ error: `Must be a valid UUID` }, 400);
-}
+};
 
 @Injectable()
 export class CheckUUIDParam implements NestMiddleware {
@@ -35,15 +37,6 @@ export class PasswordsMatch implements NestMiddleware {
   }
 }
 
-// @Injectable()
-// export class PinsMatch implements NestMiddleware {
-//   async use(req: Request, _res: Response, next: NextFunction) {
-//     if (req.body.pin && req.body.pin !== req.body.pinConfirmation)
-//       throw new HttpException({ error: "Pin doesn't match" }, 200);
-//     next();
-//   }
-// }
-
 @Injectable()
 export class EmailExists implements NestMiddleware {
   constructor(
@@ -59,11 +52,33 @@ export class EmailExists implements NestMiddleware {
         await this.userRepository.save(emailExist);
         throw new HttpException(
           {
-            message: 'This email exist on our databases, an email with confirmate instructions will be sent',
+            message: 'This email exist on our databases, an email for setting password will be sent',
           },
           200,
         );
       }
+    }
+    next();
+  }
+}
+
+@Injectable()
+export class ValidateEnvironmentStatus implements NestMiddleware {
+  async use(req: Request, _res: Response, next: NextFunction) {
+    if (req.query.status) {
+      if (!Object.values(EnvironmentStatus).includes(req.query.status as EnvironmentStatus))
+        throw new BadRequestException({ message: 'Invalid environment status' });
+    }
+    next();
+  }
+}
+
+@Injectable()
+export class ValidateEnvReservationStatus implements NestMiddleware {
+  async use(req: Request, _res: Response, next: NextFunction) {
+    if (req.query.status) {
+      if (!Object.values(EnvReservationStatus).includes(req.query.status as EnvReservationStatus))
+        throw new BadRequestException({ message: 'Invalid env reservation status' });
     }
     next();
   }

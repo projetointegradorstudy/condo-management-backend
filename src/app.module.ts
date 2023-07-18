@@ -9,7 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { EnvironmentsModule } from './environments/environments.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { EnvRequestsModule } from './env-requests/env-requests.module';
+import { EnvReservationsModule } from './env-reservations/env-reservations.module';
 
 @Module({
   imports: [
@@ -48,7 +48,7 @@ import { EnvRequestsModule } from './env-requests/env-requests.module';
     }),
     AuthModule,
     EnvironmentsModule,
-    EnvRequestsModule,
+    EnvReservationsModule,
     UsersModule,
   ],
   controllers: [AppController],

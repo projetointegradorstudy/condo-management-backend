@@ -2,28 +2,25 @@ import { HttpException, Inject, Injectable, NotFoundException, forwardRef } from
 import { AdminCreateUserDto } from './dto/admin-create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
-import { IUserService } from './interfaces/users.service';
-import { IUserRepository } from './interfaces/users.repository';
-import { EmailService } from 'src/utils/email/email.service';
+import { IUserService } from './interfaces/users-service.interface';
+import { IUserRepository } from './interfaces/users-repository.interface';
 import { CreateUserPasswordDto } from './dto/create-user-password.dto';
 import { AuthCredentialsDto } from 'src/auth/dto/auth-credentials.dto';
-import { AuthService } from 'src/auth/auth.service';
 import { ResetPasswordDto } from './dto/reset-password.dto';
-import { S3Service } from 'src/utils/upload/s3.service';
 import { IS3Service } from 'src/utils/upload/s3.interface';
 import { User } from './entities/user.entity';
-import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 import { IEmailService } from 'src/utils/email/email.interface';
-import { IAuthService } from 'src/auth/interfaces/auth.service';
+import { IAuthService } from 'src/auth/interfaces/auth-service.interface';
 
 @Injectable()
 export class UsersService implements IUserService {
   constructor(
     @Inject(IUserRepository) private readonly userRepository: IUserRepository,
-    @Inject(IS3Service) private readonly s3Service: S3Service,
-    @Inject(IEmailService) private readonly emailService: EmailService,
+    @Inject(IS3Service) private readonly s3Service: IS3Service,
+    @Inject(IEmailService) private readonly emailService: IEmailService,
     @Inject(forwardRef(() => IAuthService))
-    private readonly authService: AuthService,
+    private readonly authService: IAuthService,
   ) {}
 
   async create(adminCreateUserDto: AdminCreateUserDto): Promise<{ message: string }> {
@@ -46,10 +43,10 @@ export class UsersService implements IUserService {
     return user;
   }
 
-  async findEnvRequestsById(id: string): Promise<EnvRequest[]> {
-    const user = await this.userRepository.findBy({ where: { id }, relations: ['env_requests'] });
+  async findEnvReservationsById(id: string): Promise<EnvReservation[]> {
+    const user = await this.userRepository.findBy({ where: { id }, relations: ['env_reservations'] });
     if (!user) throw new NotFoundException();
-    return user.env_requests;
+    return user.env_reservations;
   }
 
   async findToLogin(email: string): Promise<User> {
@@ -69,12 +66,14 @@ export class UsersService implements IUserService {
   }
 
   async updateByAdmin(id: string, adminUpdateUserDto: AdminUpdateUserDto): Promise<User> {
-    await this.findOne(id);
+    const user = await this.userRepository.findBy({ where: { id } });
+    if (!user) throw new NotFoundException();
     return await this.userRepository.update({ id }, adminUpdateUserDto);
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, image?: Express.Multer.File): Promise<User> {
-    const user = await this.findOne(id);
+    const user = await this.userRepository.findBy({ where: { id } });
+    if (!user) throw new NotFoundException();
     if (image) {
       const imageUploaded = await this.s3Service.uploadFile(image, user.avatar);
       updateUserDto['avatar'] = imageUploaded.Location;
@@ -109,7 +108,8 @@ export class UsersService implements IUserService {
   }
 
   async remove(id: string): Promise<{ message: string }> {
-    await this.findOne(id);
+    const user = await this.userRepository.findBy({ where: { id } });
+    if (!user) throw new NotFoundException();
     await this.userRepository.softDelete(id);
     return { message: 'User deleted successfully' };
   }

@@ -14,8 +14,8 @@ import {
 } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
-import { ApiBearerAuth, ApiBody, ApiTags } from '@nestjs/swagger';
-import { IEnvironmentService } from './interfaces/environments.service';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { IEnvironmentService } from './interfaces/environments-service.interface';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles/roles.guard';
 import { Roles } from 'src/auth/roles/roles.decorator';
@@ -23,6 +23,7 @@ import { Role } from 'src/auth/roles/role.enum';
 import { FormData } from 'src/decorators/form-data.decorator';
 import { fileMimetypeFilter } from 'src/utils/file-mimetype-filter';
 import { ParseFile } from 'src/utils/parse-file.pipe';
+import { EnvironmentStatus } from './entities/status.enum';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
@@ -37,31 +38,8 @@ export class EnvironmentsController {
     fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
     limits: { fileSize: 5242880 /** <- 5mb */ },
   })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      required: ['name', 'description', 'capacity'],
-      properties: {
-        image: {
-          description: 'Allows .png, .jpg and jpeg - max size = 5MB',
-          type: 'string',
-          format: 'binary',
-        },
-        name: {
-          description: 'Name to presentation',
-          type: 'string',
-        },
-        description: {
-          description: "Environment's description",
-          type: 'string',
-        },
-        capacity: {
-          description: "Environment's capacity",
-          type: 'number',
-        },
-      },
-    },
-  })
+  @ApiOperation({ summary: 'Create a new Environment' })
+  @ApiBody({ type: CreateEnvironmentDto })
   create(@Body() createEnvironmentDto: CreateEnvironmentDto, @UploadedFile(ParseFile) image?: Express.Multer.File) {
     return this.environmentsService.create(createEnvironmentDto, image);
   }
@@ -73,6 +51,12 @@ export class EnvironmentsController {
   }
 
   @Get()
+  @ApiQuery({
+    name: 'status',
+    enum: EnvironmentStatus,
+    description: 'Environments status to find',
+    required: false,
+  })
   findAll(@Query('status') status?: string) {
     return this.environmentsService.findAll(status);
   }
@@ -84,9 +68,9 @@ export class EnvironmentsController {
 
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @Get(':uuid?/env-requests')
-  findUserRequests(@Param('uuid', ParseUUIDPipe) uuid: string) {
-    return this.environmentsService.findEnvRequestsById(uuid);
+  @Get(':uuid?/env-reservations')
+  findEnvReservationsById(@Param('uuid', ParseUUIDPipe) uuid: string) {
+    return this.environmentsService.findEnvReservationsById(uuid);
   }
 
   @Roles(Role.ADMIN)

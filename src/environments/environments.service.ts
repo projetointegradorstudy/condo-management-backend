@@ -1,36 +1,35 @@
-import { BadRequestException, Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { Environment } from './entities/environment.entity';
-import { IEnvironmentService } from './interfaces/environments.service';
-import { Status, isComplianceStatus, validateStatus } from './entities/status.enum';
-import { IEnvironmentRepository } from './interfaces/environments.repository';
-import { S3Service } from 'src/utils/upload/s3.service';
-import { EnvRequest } from 'src/env-requests/entities/env-request.entity';
+import { IEnvironmentService } from './interfaces/environments-service.interface';
+import { EnvironmentStatus } from './entities/status.enum';
+import { IEnvironmentRepository } from './interfaces/environments-repository.interface';
+import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
+import { IS3Service } from 'src/utils/upload/s3.interface';
 
 @Injectable()
 export class EnvironmentsService implements IEnvironmentService {
   constructor(
     @Inject(IEnvironmentRepository) private readonly environmentRepository: IEnvironmentRepository,
-    private readonly s3Service: S3Service,
+    @Inject(IS3Service) private readonly s3Service: IS3Service,
   ) {}
 
-  async create(createEnvironmentDto: CreateEnvironmentDto, image?: Express.Multer.File): Promise<Environment> {
+  async create(createEnvironmentDto: CreateEnvironmentDto, image?: Express.Multer.File): Promise<{ message: string }> {
     if (image) {
       const imageUploaded = await this.s3Service.uploadFile(image);
       createEnvironmentDto['image'] = imageUploaded.Location;
     }
-    return await this.environmentRepository.create(createEnvironmentDto);
+    await this.environmentRepository.create(createEnvironmentDto);
+    return { message: 'Environment created successfully' };
   }
 
   async count(): Promise<number> {
     return await this.environmentRepository.count();
   }
 
-  async findAll(status: string): Promise<Environment[]> {
-    if (!validateStatus(status)) throw new BadRequestException({ message: 'invalid environments status' });
-
-    return await this.environmentRepository.find({ where: { status: status as Status } });
+  async findAll(status?: string): Promise<Environment[]> {
+    return await this.environmentRepository.find({ where: { status: status as EnvironmentStatus } });
   }
 
   async findOne(id: string): Promise<Environment> {
@@ -39,7 +38,7 @@ export class EnvironmentsService implements IEnvironmentService {
     return environment;
   }
 
-  async findEnvRequestsById(id: string): Promise<EnvRequest[]> {
+  async findEnvReservationsById(id: string): Promise<EnvReservation[]> {
     const environment = await this.environmentRepository.findBy({ where: { id }, relations: ['env_requests'] });
     if (!environment) throw new NotFoundException();
     return environment.env_requests;
@@ -50,12 +49,8 @@ export class EnvironmentsService implements IEnvironmentService {
     updateEnvironmentDto: UpdateEnvironmentDto,
     image?: Express.Multer.File,
   ): Promise<Environment> {
-    const environment = await this.findOne(id);
-
-    const errorMessage = isComplianceStatus(updateEnvironmentDto.status, environment.status);
-    if (errorMessage) {
-      throw new BadRequestException({ message: errorMessage });
-    }
+    const environment = await this.environmentRepository.findBy({ where: { id } });
+    if (!environment) throw new NotFoundException();
 
     if (image) {
       const imageUploaded = await this.s3Service.uploadFile(image, environment.image);
@@ -70,5 +65,12 @@ export class EnvironmentsService implements IEnvironmentService {
     if (!environment) throw new NotFoundException();
     await this.environmentRepository.softDelete(environment.id);
     return { message: 'Environment deleted successfully' };
+  }
+
+  private async checkEnvironmentStatus(id: string): Promise<void> {
+    const environment = await this.environmentRepository.findBy({ where: { id } });
+    if (!environment) throw new NotFoundException();
+    if (!(environment.status === EnvironmentStatus.AVAILABLE))
+      throw new BadRequestException('Environment not available');
   }
 }

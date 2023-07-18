@@ -1,14 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsValid } from 'src/decorators/validate.decorator';
 
 export class AuthCredentialsDto {
-  @ApiProperty({ example: 'john_doo@contoso.com' })
-  @IsString()
-  @IsNotEmpty()
+  @ApiProperty({ example: 'john.doo@contoso.com' })
+  @IsValid()
   email: string;
 
-  @ApiProperty()
-  @IsString()
-  @IsNotEmpty()
+  @ApiProperty({
+    description: 'Password must have 10 character of length and at least one of each (A-Z, a-z, 0-9, !-@-$-*)',
+    example: 'Abc3xamp!e',
+  })
+  @IsValid()
   password: string;
 }
