@@ -28,6 +28,7 @@ export class EnvReservationsService implements IEnvReservationService {
     return await this.envRequestRepository.find({
       where: { status: status as EnvReservationStatus },
       relations: ['user', 'environment'],
+      order: { created_at: 'ASC' },
     });
   }
 
@@ -35,6 +36,7 @@ export class EnvReservationsService implements IEnvReservationService {
     return await this.envRequestRepository.find({
       where: { user_id: userId, status: status as EnvReservationStatus },
       relations: ['user', 'environment'],
+      order: { created_at: 'ASC' },
     });
   }
 
