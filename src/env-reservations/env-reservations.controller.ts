@@ -251,7 +251,6 @@ export class EnvReservationsController {
   }
 
   @Patch(':uuid')
-  @Roles(Role.ADMIN)
   @ApiOperation({ summary: 'Update' })
   @ApiOkResponse({
     description: 'An updated reservation',
@@ -273,26 +272,6 @@ export class EnvReservationsController {
         error: {
           type: 'string',
           default: 'Bad Request',
-        },
-      },
-    },
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden request',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          default: 403,
-        },
-        message: {
-          type: 'string',
-          default: 'Forbidden resource',
-        },
-        error: {
-          type: 'string',
-          default: 'Forbidden',
         },
       },
     },
