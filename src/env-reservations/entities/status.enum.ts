@@ -1,5 +1,5 @@
 export enum EnvReservationStatus {
-  APPROVED = 'available',
+  APPROVED = 'approved',
   PENDING = 'pending',
   NOT_APPROVED = 'not_approved',
   CANCELLED = 'cancelled',
