@@ -28,6 +28,7 @@ export class EnvReservationsModule implements NestModule {
       .apply(ValidateEnvReservationStatus)
       .forRoutes(
         { path: 'env-reservations', method: RequestMethod.GET },
+        { path: 'env-reservations/count', method: RequestMethod.GET },
         { path: 'env-reservations/user', method: RequestMethod.GET },
       );
   }

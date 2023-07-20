@@ -98,6 +98,12 @@ export class EnvReservationsController {
 
   @Get('count')
   @ApiOperation({ summary: 'Count' })
+  @ApiQuery({
+    name: 'status',
+    enum: EnvReservationStatus,
+    description: 'Reservation status',
+    required: false,
+  })
   @ApiOkResponse({
     description: 'Counted successfully',
     schema: {
@@ -105,8 +111,8 @@ export class EnvReservationsController {
       example: 5,
     },
   })
-  count() {
-    return this.envRequestsService.count();
+  count(@Query('status') status?: string) {
+    return this.envRequestsService.count(status);
   }
 
   @Get()

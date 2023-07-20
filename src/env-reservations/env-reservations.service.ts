@@ -20,8 +20,8 @@ export class EnvReservationsService implements IEnvReservationService {
     return { message: 'Reservation created successfully' };
   }
 
-  async count() {
-    return await this.envRequestRepository.count();
+  async count(status?: string) {
+    return await this.envRequestRepository.count({ where: { status: status as EnvReservationStatus } });
   }
 
   async findAll(status?: string): Promise<EnvReservation[]> {

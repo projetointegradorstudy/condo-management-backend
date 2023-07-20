@@ -5,7 +5,7 @@ import { EnvReservation } from '../entities/env-reservation.entity';
 
 export interface IEnvReservationService {
   create(createEnvReservationDto: CreateEnvReservationDto, id: string): Promise<{ message: string }>;
-  count(): Promise<number>;
+  count(status: string): Promise<number>;
   findAll(status: string): Promise<EnvReservation[]>;
   findAllByUser(userId: string, status: string): Promise<EnvReservation[]>;
   findOne(id: string): Promise<EnvReservation>;
