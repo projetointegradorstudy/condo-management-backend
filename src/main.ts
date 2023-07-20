@@ -1,6 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { Logger, UnauthorizedException, ValidationPipe } from '@nestjs/common';
+import { ForbiddenException, Logger, ValidationPipe } from '@nestjs/common';
 import * as basicAuth from 'express-basic-auth';
 import { NextFunction, Request, Response } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -52,7 +52,7 @@ async function bootstrap() {
         if ((await allowList()).indexOf(origin) !== -1) {
           callback(null, true);
         } else {
-          callback(new UnauthorizedException('Not allowed by CORS'));
+          callback(new ForbiddenException('Not allowed by CORS'));
         }
       },
     });

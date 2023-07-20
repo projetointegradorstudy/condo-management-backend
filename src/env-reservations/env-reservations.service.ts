@@ -17,7 +17,7 @@ export class EnvReservationsService implements IEnvReservationService {
     createEnvReservationDto['user_id'] = id;
     await this.checkEnvironmentAvailability(createEnvReservationDto);
     await this.envRequestRepository.create(createEnvReservationDto);
-    return { message: 'Env reservation created successfully' };
+    return { message: 'Reservation created successfully' };
   }
 
   async count() {
@@ -66,7 +66,7 @@ export class EnvReservationsService implements IEnvReservationService {
     const envReservation = await this.envRequestRepository.findBy({ where: { id } });
     if (!envReservation) throw new NotFoundException();
     await this.envRequestRepository.softDelete(envReservation.id);
-    return { message: 'EnvReservation deleted successfully' };
+    return { message: 'Reservation deleted successfully' };
   }
 
   private async checkUserRole(user: Partial<User>, envReservation: EnvReservation): Promise<void> {
