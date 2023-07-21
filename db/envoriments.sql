@@ -1,8 +1,0 @@
-CREATE TABLE environments (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name VARCHAR NOT NULL,
-  status VARCHAR(20) DEFAULT 'available',
-  image VARCHAR NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
