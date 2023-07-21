@@ -22,6 +22,10 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm": "npm run build && npx typeorm -d dist/db/data-source.js",
+    "migration:generate": "npm run typeorm -- migration:generate ./src/db/migrations/$npm_config_arg",
+    "migration:run": "npm run typeorm -- migration:run",
+    "migration:revert": "npm run typeorm -- migration:revert",
     "dev": "docker compose -f docker-compose.dev.yml up -d",
     "down": "docker compose down --remove-orphans"
   },
@@ -39,6 +43,7 @@
     "bcrypt": "^5.1.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",
+    "dotenv": "^16.3.1",
     "express-basic-auth": "^1.2.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
