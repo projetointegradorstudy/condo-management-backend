@@ -111,7 +111,27 @@ export class EnvReservationsController {
       example: 5,
     },
   })
-  count(@Query('status') status?: string) {
+  @ApiBadRequestResponse({
+    description: 'Bad Request',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          default: 400,
+        },
+        message: {
+          type: 'string',
+          default: 'Invalid reservation status',
+        },
+        error: {
+          type: 'string',
+          default: 'Bad Request',
+        },
+      },
+    },
+  })
+  count(@Query('status') status?: EnvReservationStatus) {
     return this.envRequestsService.count(status);
   }
 
@@ -169,7 +189,7 @@ export class EnvReservationsController {
       },
     },
   })
-  findAll(@Query('status') status?: string) {
+  findAll(@Query('status') status?: EnvReservationStatus) {
     return this.envRequestsService.findAll(status);
   }
 
@@ -206,7 +226,7 @@ export class EnvReservationsController {
       },
     },
   })
-  findAllByUser(@Req() req: any, @Query('status') status?: string) {
+  findAllByUser(@Req() req: any, @Query('status') status?: EnvReservationStatus) {
     return this.envRequestsService.findAllByUser(req.user.user.id, status);
   }
 

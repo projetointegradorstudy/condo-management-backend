@@ -20,11 +20,11 @@ export class EnvReservationsService implements IEnvReservationService {
     return { message: 'Reservation created successfully' };
   }
 
-  async count(status?: string) {
+  async count(status?: EnvReservationStatus) {
     return await this.envRequestRepository.count({ where: { status: status as EnvReservationStatus } });
   }
 
-  async findAll(status?: string): Promise<EnvReservation[]> {
+  async findAll(status?: EnvReservationStatus): Promise<EnvReservation[]> {
     return await this.envRequestRepository.find({
       where: { status: status as EnvReservationStatus },
       relations: ['user', 'environment'],
@@ -32,7 +32,7 @@ export class EnvReservationsService implements IEnvReservationService {
     });
   }
 
-  async findAllByUser(userId: string, status?: string): Promise<EnvReservation[]> {
+  async findAllByUser(userId: string, status?: EnvReservationStatus): Promise<EnvReservation[]> {
     return await this.envRequestRepository.find({
       where: { user_id: userId, status: status as EnvReservationStatus },
       relations: ['user', 'environment'],
