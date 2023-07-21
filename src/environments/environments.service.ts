@@ -24,11 +24,11 @@ export class EnvironmentsService implements IEnvironmentService {
     return { message: 'Environment created successfully' };
   }
 
-  async count(): Promise<number> {
-    return await this.environmentRepository.count();
+  async count(status?: EnvironmentStatus): Promise<number> {
+    return await this.environmentRepository.count({ where: { status: status as EnvironmentStatus } });
   }
 
-  async findAll(status?: string): Promise<Environment[]> {
+  async findAll(status?: EnvironmentStatus): Promise<Environment[]> {
     return await this.environmentRepository.find({ where: { status: status as EnvironmentStatus } });
   }
 

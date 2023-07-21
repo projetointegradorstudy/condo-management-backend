@@ -67,7 +67,7 @@ export class ValidateEnvironmentStatus implements NestMiddleware {
   async use(req: Request, _res: Response, next: NextFunction) {
     if (req.query.status) {
       if (!Object.values(EnvironmentStatus).includes(req.query.status as EnvironmentStatus))
-        throw new BadRequestException({ message: 'Invalid environment status' });
+        throw new BadRequestException('Invalid environment status');
     }
     next();
   }
@@ -78,92 +78,8 @@ export class ValidateEnvReservationStatus implements NestMiddleware {
   async use(req: Request, _res: Response, next: NextFunction) {
     if (req.query.status) {
       if (!Object.values(EnvReservationStatus).includes(req.query.status as EnvReservationStatus))
-        throw new BadRequestException({ message: 'Invalid env reservation status' });
+        throw new BadRequestException('Invalid reservation status');
     }
     next();
   }
 }
-
-// @Injectable()
-// export class UserExists implements NestMiddleware {
-//   constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
-//   async use(req: Request, _res: Response, next: NextFunction) {
-//     if (req.body.owner_user) {
-//       checkUUID(req.body.owner_user);
-//       const userExist = await this.userRepository.findOne({ external_id: req.body.owner_user });
-//       if (!userExist) throw new HttpException({ error: 'Not found' }, 200);
-//     }
-//     next();
-//   }
-// }
-
-// @Injectable()
-// export class DonationUserExists implements NestMiddleware {
-//   constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
-//   async use(req: Request, _res: Response, next: NextFunction) {
-//     if (req.body.destinatary_user || req.body.owner_user) {
-//       checkUUID(req.body.destinatary_user || req.body.owner_user);
-//       const userExist = await this.userRepository.findOne({
-//         external_id: req.body.destinatary_user ?? req.body.owner_user,
-//       });
-//       if (!userExist) throw new HttpException({ error: 'Not found' }, 200);
-//     }
-//     next();
-//   }
-// }
-
-// @Injectable()
-// export class DonationExists implements NestMiddleware {
-//   constructor(@InjectRepository(Donation) private donationRepository: Repository<Donation>) {}
-//   async use(req: Request, _res: Response, next: NextFunction) {
-//     if (req.body.donation_id) {
-//       checkUUID(req.body.donation_id);
-//       const donationExist = await this.donationRepository.findOne({
-//         external_id: req.body.donation_id,
-//       });
-//       if (!donationExist) throw new HttpException({ error: 'Donation not found' }, 200);
-//     }
-//     next();
-//   }
-// }
-
-// @Injectable()
-// export class PayerExistToPayment implements NestMiddleware {
-//   constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
-//   async use(req: Request, _res: Response, next: NextFunction) {
-//     if (req.body.payer_id) {
-//       checkUUID(req.body.payer_id);
-//       const userExist = await this.userRepository.findOne({
-//         external_id: req.body.payer_id,
-//       });
-//       if (!userExist) throw new HttpException({ error: 'Payer not found' }, 200);
-//     }
-//     next();
-//   }
-// }
-
-// @Injectable()
-// export class MinTransactionsValue implements NestMiddleware {
-//   async use(req: Request, _res: Response, next: NextFunction) {
-//     if (req.body.value || req.query.value) {
-//       const minValue = +process.env.MIN_TRANSACTION_VALUE;
-//       const typedValue = +req.body.value || +req.query.value;
-//       if (!!(typedValue % minValue) || typedValue < minValue)
-//         throw new HttpException({ error: `Value must be higher and multiple of ${minValue}` }, 200);
-//     }
-//     next();
-//   }
-// }
-
-// @Injectable()
-// export class OwnerBalanceExists implements NestMiddleware {
-//   constructor(@InjectRepository(Balance) private balanceRepository: Repository<Balance>) {}
-//   async use(req: Request, _res: Response, next: NextFunction) {
-//     if (req.body.owner_user) {
-//       checkUUID(req.body.owner_user);
-//       const ownerBalance = await this.balanceRepository.findOne({ owner_user: req.body.owner_user });
-//       if (ownerBalance) throw new HttpException({ error: 'This user already has a balance' }, 200);
-//     }
-//     next();
-//   }
-// }

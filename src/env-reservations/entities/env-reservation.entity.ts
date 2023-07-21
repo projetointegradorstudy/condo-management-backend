@@ -19,8 +19,8 @@ export class EnvReservation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ enum: EnvReservationStatus, default: EnvReservationStatus.APPROVED })
-  @Column({ default: EnvReservationStatus.PENDING })
+  @ApiProperty({ type: 'enum', enum: EnvReservationStatus, default: EnvReservationStatus.APPROVED })
+  @Column({ type: 'enum', enum: EnvReservationStatus, default: EnvReservationStatus.PENDING })
   status: EnvReservationStatus;
 
   @ApiProperty({ type: 'uuid', example: '571cecb0-0dce-4fa0-8410-aee5646fcfed' })

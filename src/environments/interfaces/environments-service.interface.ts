@@ -2,11 +2,12 @@ import { EnvReservation } from 'src/env-reservations/entities/env-reservation.en
 import { CreateEnvironmentDto } from '../dto/create-environment.dto';
 import { UpdateEnvironmentDto } from '../dto/update-environment.dto';
 import { Environment } from '../entities/environment.entity';
+import { EnvironmentStatus } from '../entities/status.enum';
 
 export interface IEnvironmentService {
   create(createEnvironmentDto: CreateEnvironmentDto, image?: Express.Multer.File): Promise<{ message: string }>;
-  count(): Promise<number>;
-  findAll(status: string): Promise<Environment[]>;
+  count(status?: EnvironmentStatus): Promise<number>;
+  findAll(status?: EnvironmentStatus): Promise<Environment[]>;
   findOne(id: string): Promise<Environment>;
   findEnvReservationsById(id: string): Promise<EnvReservation[]>;
   update(id: string, updateEnvironmentDto: UpdateEnvironmentDto, image?: Express.Multer.File): Promise<Environment>;
