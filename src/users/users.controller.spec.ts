@@ -141,7 +141,7 @@ describe('UsersController', () => {
       ];
       jest.spyOn(userService, 'findEnvReservationsById').mockResolvedValueOnce(envReservations);
 
-      const result = await usersController.findUserRequests(id, undefined);
+      const result = await usersController.findUserReservations(id, undefined);
 
       expect(userService.findEnvReservationsById).toHaveBeenCalledWith(id);
       expect(result).toEqual(envReservations);
@@ -163,7 +163,7 @@ describe('UsersController', () => {
       ];
       jest.spyOn(userService, 'findEnvReservationsById').mockResolvedValueOnce(envReservations);
 
-      const result = await usersController.findUserRequests(undefined, req);
+      const result = await usersController.findUserReservations(undefined, req);
 
       expect(userService.findEnvReservationsById).toHaveBeenCalledWith(req.user.user.id);
       expect(result).toEqual(envReservations);

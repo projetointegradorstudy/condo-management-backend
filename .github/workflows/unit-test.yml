@@ -1,9 +1,9 @@
-name: EsLint Code Verifyer
+name: Unit Test
 
 on: ['pull_request']
 
 jobs:
-  ESLINT:
+  Unit_Test:
     runs-on: ubuntu-latest
     steps:
       - name: 📂 Checking repository
@@ -17,5 +17,5 @@ jobs:
       - name: 📦 Installing the dependencies from package.json
         run: npm ci
 
-      - name: 🧐 Running eslint to code verify
-        run: npm run lint
+      - name: 💥 Running unit tests
+        run: npm test

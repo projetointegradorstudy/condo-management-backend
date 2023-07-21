@@ -50,7 +50,7 @@ describe('envReservationsService', () => {
       const result = await envReservationsService.create(CreateEnvReservationDto, user_id);
 
       expect(mockEnvReservationRepository.create).toHaveBeenCalledWith(CreateEnvReservationDto);
-      expect(result).toEqual({ message: 'Env reservation created successfully' });
+      expect(result).toEqual({ message: 'Reservation created successfully' });
     });
   });
 
@@ -88,6 +88,7 @@ describe('envReservationsService', () => {
       expect(mockEnvReservationRepository.find).toHaveBeenCalledWith({
         where: { status: status as EnvReservationStatus },
         relations: ['user', 'environment'],
+        order: { created_at: 'ASC' },
       });
       expect(result).toEqual(envReservations);
     });
@@ -117,6 +118,7 @@ describe('envReservationsService', () => {
       expect(mockEnvReservationRepository.find).toHaveBeenCalledWith({
         where: { user_id: userId, status: status as EnvReservationStatus },
         relations: ['user', 'environment'],
+        order: { created_at: 'ASC' },
       });
       expect(result).toEqual(envReservations);
     });
@@ -273,7 +275,7 @@ describe('envReservationsService', () => {
 
       expect(mockEnvReservationRepository.findBy).toHaveBeenCalledWith({ where: { id } });
       expect(mockEnvReservationRepository.softDelete).toHaveBeenCalledWith(existingEnvReservation.id);
-      expect(result).toEqual({ message: 'EnvReservation deleted successfully' });
+      expect(result).toEqual({ message: 'Reservation deleted successfully' });
     });
   });
 });

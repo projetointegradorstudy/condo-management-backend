@@ -50,6 +50,21 @@ Kill containers
 docker compose down
 ```
 
+Generates migrations
+```bash
+npm run migration:generate --arg=NameOfMigration
+```
+
+Runs migrations
+```bash
+npm run migration:run
+```
+
+Revert migrations
+```bash
+npm run migration:revert
+```
+
 ## Running the app
 
 Development
