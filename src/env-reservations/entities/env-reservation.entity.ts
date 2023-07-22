@@ -48,7 +48,7 @@ export class EnvReservation {
   updated_at: Date;
 
   @ApiProperty({ required: false })
-  @DeleteDateColumn({ nullable: true })
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
   deleted_at?: Date;
 
   @ManyToOne(() => User, (user: User) => user.env_reservations)

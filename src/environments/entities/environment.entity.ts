@@ -38,15 +38,15 @@ export class Environment {
   capacity: number;
 
   @ApiProperty()
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 
   @ApiProperty()
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updated_at: Date;
 
   @ApiProperty({ required: false })
-  @DeleteDateColumn({ nullable: true })
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
   deleted_at?: Date;
 
   @OneToMany(() => EnvReservation, (envReservation: EnvReservation) => envReservation.environment)
