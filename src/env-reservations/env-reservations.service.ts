@@ -59,6 +59,7 @@ export class EnvReservationsService implements IEnvReservationService {
       relations: ['user', 'environment'],
     });
     if (!envReservation) throw new NotFoundException();
+    if (envReservation.status !== EnvReservationStatus.PENDING) throw new ForbiddenException();
     await this.checkUserRole(user, envReservation);
 
     return await this.envRequestRepository.update({ id }, updateEnvReservationDto);
