@@ -44,9 +44,9 @@ export class EnvironmentsService implements IEnvironmentService {
   }
 
   async findEnvReservationsById(id: string): Promise<EnvReservation[]> {
-    const environment = await this.environmentRepository.findBy({ where: { id }, relations: ['env_requests'] });
+    const environment = await this.environmentRepository.findBy({ where: { id }, relations: ['env_reservations'] });
     if (!environment) throw new NotFoundException();
-    return environment.env_requests;
+    return environment.env_reservations;
   }
 
   async update(

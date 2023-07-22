@@ -49,6 +49,6 @@ export class Environment {
   @DeleteDateColumn({ nullable: true })
   deleted_at?: Date;
 
-  @OneToMany(() => EnvReservation, (envRequest: EnvReservation) => envRequest.environment)
-  env_requests: EnvReservation[];
+  @OneToMany(() => EnvReservation, (envReservation: EnvReservation) => envReservation.environment)
+  env_reservations: EnvReservation[];
 }

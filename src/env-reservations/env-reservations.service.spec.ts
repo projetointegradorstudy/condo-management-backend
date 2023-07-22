@@ -88,7 +88,7 @@ describe('envReservationsService', () => {
       expect(mockEnvReservationRepository.find).toHaveBeenCalledWith({
         where: { status: status as EnvReservationStatus },
         relations: ['user', 'environment'],
-        order: { created_at: 'ASC' },
+        order: { created_at: 'DESC' },
       });
       expect(result).toEqual(envReservations);
     });
@@ -118,7 +118,7 @@ describe('envReservationsService', () => {
       expect(mockEnvReservationRepository.find).toHaveBeenCalledWith({
         where: { user_id: userId, status: status as EnvReservationStatus },
         relations: ['user', 'environment'],
-        order: { created_at: 'ASC' },
+        order: { created_at: 'DESC' },
       });
       expect(result).toEqual(envReservations);
     });

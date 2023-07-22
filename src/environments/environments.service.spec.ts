@@ -9,6 +9,7 @@ import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { createMockImage } from 'src/utils/upload/mocks/image.mock';
 import { EnvReservationStatus } from 'src/env-reservations/entities/status.enum';
 import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
+import { Not } from 'typeorm';
 
 describe('EnvironmentsService', () => {
   let environmentsService: EnvironmentsService;
@@ -46,7 +47,7 @@ describe('EnvironmentsService', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
 
       mockEnvironmentRepository.create.mockResolvedValue(createdEnvironment);
@@ -78,7 +79,7 @@ describe('EnvironmentsService', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
 
       mockEnvironmentRepository.create.mockResolvedValue(createdEnvironment);
@@ -105,6 +106,7 @@ describe('EnvironmentsService', () => {
 
   describe('findAll', () => {
     it('should find all environments by specific status', async () => {
+      const user = { id: '571cecb0-0dce-4fa0-8410-aee5646fcfed' };
       const status = EnvironmentStatus.AVAILABLE;
       const environments: Environment[] = [
         {
@@ -114,15 +116,17 @@ describe('EnvironmentsService', () => {
           capacity: 4,
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
-          env_requests: [],
+          env_reservations: [],
         },
       ];
 
       mockEnvironmentRepository.find.mockResolvedValue(environments);
 
-      const result = await environmentsService.findAll(status);
+      const result = await environmentsService.findAll(user, status);
 
-      expect(mockEnvironmentRepository.find).toHaveBeenCalledWith({ where: { status } });
+      expect(mockEnvironmentRepository.find).toHaveBeenCalledWith({
+        where: { status: Not(EnvironmentStatus.DISABLED) },
+      });
       expect(result).toEqual(environments);
     });
   });
@@ -137,7 +141,7 @@ describe('EnvironmentsService', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
 
       mockEnvironmentRepository.findBy.mockResolvedValue(foundEnvironment);
@@ -158,7 +162,7 @@ describe('EnvironmentsService', () => {
   });
 
   describe('findEnvReservationsById', () => {
-    it("should return the environment's requests", async () => {
+    it("should return the environment's reservationenv_reservations", async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const foundEnvironmentRequests: EnvReservation[] = [
         {
@@ -180,14 +184,14 @@ describe('EnvironmentsService', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: foundEnvironmentRequests,
+        env_reservations: foundEnvironmentRequests,
       };
 
       mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
 
       const result = await environmentsService.findEnvReservationsById(id);
 
-      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ where: { id }, relations: ['env_requests'] });
+      expect(mockEnvironmentRepository.findBy).toHaveBeenCalledWith({ where: { id }, relations: ['env_reservations'] });
       expect(result).toEqual(foundEnvironmentRequests);
     });
 
@@ -225,7 +229,7 @@ describe('EnvironmentsService', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
       const updateEnvironmentDto: UpdateEnvironmentDto = {
         name: 'updated name',
@@ -240,7 +244,7 @@ describe('EnvironmentsService', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
 
       mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
@@ -265,7 +269,7 @@ describe('EnvironmentsService', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
       const updateEnvironmentDto: UpdateEnvironmentDto = {
         name: 'updated name',
@@ -286,7 +290,7 @@ describe('EnvironmentsService', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
 
       mockEnvironmentRepository.findBy.mockResolvedValue(existingEnvironment);
@@ -312,7 +316,7 @@ describe('EnvironmentsService', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
 
       mockEnvironmentRepository.findBy.mockResolvedValue(environment);

@@ -122,7 +122,7 @@ describe('UsersService', () => {
 
       const result = await usersService.findAll();
 
-      expect(userRepository.find).toHaveBeenCalledWith();
+      expect(userRepository.find).toHaveBeenCalledWith({ order: { created_at: 'ASC' } });
       expect(result).toEqual(users);
     });
   });

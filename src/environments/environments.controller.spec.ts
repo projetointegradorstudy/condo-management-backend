@@ -55,6 +55,7 @@ describe('EnvironmentsController', () => {
 
   describe('find', () => {
     it('should find all environments', async () => {
+      const req = { user: { user: { id: '571cecb0-0dce-4fa0-8410-aee5646fcfed' } } };
       const environments: Environment[] = [
         {
           id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
@@ -63,7 +64,7 @@ describe('EnvironmentsController', () => {
           capacity: 4,
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
-          env_requests: [],
+          env_reservations: [],
         },
         {
           id: '571cecb0-0dce-4fa0-8410-aee5646fcfed',
@@ -72,13 +73,13 @@ describe('EnvironmentsController', () => {
           capacity: 4,
           created_at: new Date(Date.now()),
           updated_at: new Date(Date.now()),
-          env_requests: [],
+          env_reservations: [],
         },
       ];
 
       mockEnvironmentService.findAll.mockResolvedValue(environments);
 
-      const result = await environmentsController.findAll();
+      const result = await environmentsController.findAll(req);
 
       expect(mockEnvironmentService.findAll).toHaveBeenCalled();
       expect(result).toBe(environments);
@@ -95,7 +96,7 @@ describe('EnvironmentsController', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
 
       mockEnvironmentService.findOne.mockResolvedValue(foundEnvironment);
@@ -108,7 +109,7 @@ describe('EnvironmentsController', () => {
   });
 
   describe('findEnvReservationsById', () => {
-    it("should return the environment's requests", async () => {
+    it("should return the environment's reservaenv_reservations", async () => {
       const id = '571cecb0-0dce-4fa0-8410-aee5646fcfed';
       const foundEnvironmentRequests: EnvReservation[] = [
         {
@@ -148,7 +149,7 @@ describe('EnvironmentsController', () => {
         capacity: 4,
         created_at: new Date(Date.now()),
         updated_at: new Date(Date.now()),
-        env_requests: [],
+        env_reservations: [],
       };
 
       mockEnvironmentService.update.mockResolvedValue(updatedEnvironment);
