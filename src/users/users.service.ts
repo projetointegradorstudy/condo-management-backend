@@ -34,7 +34,7 @@ export class UsersService implements IUserService {
   }
 
   async findAll(): Promise<User[]> {
-    return await this.userRepository.find();
+    return await this.userRepository.find({ order: { created_at: 'ASC' } });
   }
 
   async findOne(id: string): Promise<User> {
