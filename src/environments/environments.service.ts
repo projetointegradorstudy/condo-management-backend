@@ -1,4 +1,4 @@
-import { Injectable, Inject, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
 import { Environment } from './entities/environment.entity';
@@ -7,6 +7,9 @@ import { EnvironmentStatus } from './entities/status.enum';
 import { IEnvironmentRepository } from './interfaces/environments-repository.interface';
 import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 import { IS3Service } from 'src/utils/upload/s3.interface';
+import { User } from 'src/users/entities/user.entity';
+import { Role } from 'src/auth/roles/role.enum';
+import { FindOptionsWhere, Not } from 'typeorm';
 
 @Injectable()
 export class EnvironmentsService implements IEnvironmentService {
@@ -28,8 +31,10 @@ export class EnvironmentsService implements IEnvironmentService {
     return await this.environmentRepository.count({ where: { status: status as EnvironmentStatus } });
   }
 
-  async findAll(status?: EnvironmentStatus): Promise<Environment[]> {
-    return await this.environmentRepository.find({ where: { status: status as EnvironmentStatus } });
+  async findAll(user: Partial<User>, status?: EnvironmentStatus): Promise<Environment[]> {
+    const findOptions: FindOptionsWhere<Environment> =
+      user.role === Role.ADMIN ? { status: status as EnvironmentStatus } : { status: Not(EnvironmentStatus.DISABLED) };
+    return await this.environmentRepository.find({ where: findOptions });
   }
 
   async findOne(id: string): Promise<Environment> {
@@ -72,5 +77,9 @@ export class EnvironmentsService implements IEnvironmentService {
     if (!environment) throw new NotFoundException();
     if (!(environment.status === EnvironmentStatus.AVAILABLE))
       throw new BadRequestException('Environment not available');
+  }
+
+  private async checkUserRole(user: Partial<User>, envReservation: EnvReservation): Promise<void> {
+    if (user.role === Role.USER && envReservation.user_id !== user.id) throw new ForbiddenException();
   }
 }

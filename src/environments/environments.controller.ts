@@ -11,6 +11,7 @@ import {
   Query,
   UseGuards,
   UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { CreateEnvironmentDto } from './dto/create-environment.dto';
 import { UpdateEnvironmentDto } from './dto/update-environment.dto';
@@ -240,8 +241,8 @@ export class EnvironmentsController {
     description: 'Environments status to find',
     required: false,
   })
-  findAll(@Query('status') status?: EnvironmentStatus) {
-    return this.environmentsService.findAll(status);
+  findAll(@Req() req: any, @Query('status') status?: EnvironmentStatus) {
+    return this.environmentsService.findAll(req.user.user, status);
   }
 
   @Get(':uuid')
