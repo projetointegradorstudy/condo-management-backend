@@ -20,7 +20,7 @@ export function IsValid(validationOptions?: ValidationOptions) {
       validator: {
         validate(value: string, args: ValidationArguments) {
           const regex = {
-            email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+            email: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/,
             password: /^((?=.*\d)(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).{10,}$/,
           };
           if (!regex[args.property].test(value)) return false;
