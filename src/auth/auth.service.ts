@@ -1,11 +1,11 @@
-import { Inject, Injectable, UnauthorizedException, forwardRef } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { JwtPayload } from './jwt-payload.interface';
 import { IAuthService } from './interfaces/auth-service.interface';
 import { IUserService } from 'src/users/interfaces/users-service.interface';
-import { IGoogleOAuth } from './interfaces/google-oaut.interface';
+import { IFacebookOAuth, IGoogleOAuth } from './interfaces/oauts.interface';
 import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
@@ -34,6 +34,22 @@ export class AuthService implements IAuthService {
       audience: process.env.GOOGLE_CLIENT_ID,
     });
     const user = await this.usersService.findOneByEmail(ticket.getPayload().email);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    const payload: JwtPayload = { user };
+    return { access_token: this.jwtService.sign(payload) };
+  }
+
+  async facebookLogin(credential: IFacebookOAuth): Promise<{ access_token: string }> {
+    fetch(`${process.env.FACEBOOK_URL_VERIFY_TOKEN}${credential.accessToken}`)
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.id !== process.env.FACEBOOK_APP_ID) throw new UnauthorizedException('Invalid credentials');
+      })
+      .catch((e) => {
+        throw new BadRequestException(e?.data?.response?.message || 'Bad Request');
+      });
+
+    const user = await this.usersService.findOneByEmail(credential.email);
     if (!user) throw new UnauthorizedException('Invalid credentials');
     const payload: JwtPayload = { user };
     return { access_token: this.jwtService.sign(payload) };
