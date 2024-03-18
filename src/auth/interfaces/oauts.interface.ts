@@ -1,9 +1,14 @@
-export interface IGoogleOAuth {
-  token: string;
+export interface IFacebookOAuth {
+  email: string;
+  accessToken: string;
 }
 
-export interface IFacebookOAuth {
-  id: string;
+export interface IGoogleOAuth {
+  email: string;
+  accessToken: string;
+}
+
+export interface IMicrosoftOAuth {
   email: string;
   accessToken: string;
 }

@@ -5,7 +5,7 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 import { JwtPayload } from './jwt-payload.interface';
 import { IAuthService } from './interfaces/auth-service.interface';
 import { IUserService } from 'src/users/interfaces/users-service.interface';
-import { IFacebookOAuth, IGoogleOAuth } from './interfaces/oauts.interface';
+import { IFacebookOAuth, IGoogleOAuth, IMicrosoftOAuth } from './interfaces/oauts.interface';
 import { OAuth2Client } from 'google-auth-library';
 
 @Injectable()
@@ -28,17 +28,6 @@ export class AuthService implements IAuthService {
     return { access_token: this.jwtService.sign(payload) };
   }
 
-  async googleLogin(credential: IGoogleOAuth): Promise<{ access_token: string }> {
-    const ticket = await this.googleOAuth2.verifyIdToken({
-      idToken: credential.token,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-    const user = await this.usersService.findOneByEmail(ticket.getPayload().email);
-    if (!user) throw new UnauthorizedException('Invalid credentials');
-    const payload: JwtPayload = { user };
-    return { access_token: this.jwtService.sign(payload) };
-  }
-
   async facebookLogin(credential: IFacebookOAuth): Promise<{ access_token: string }> {
     fetch(`${process.env.FACEBOOK_URL_VERIFY_TOKEN}${credential.accessToken}`)
       .then((res) => res.json())
@@ -49,6 +38,25 @@ export class AuthService implements IAuthService {
         throw new BadRequestException(e?.data?.response?.message || 'Bad Request');
       });
 
+    const user = await this.usersService.findOneByEmail(credential.email);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    const payload: JwtPayload = { user };
+    return { access_token: this.jwtService.sign(payload) };
+  }
+
+  async googleLogin(credential: IGoogleOAuth): Promise<{ access_token: string }> {
+    const ticket = await this.googleOAuth2.verifyIdToken({
+      idToken: credential.accessToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const user = await this.usersService.findOneByEmail(ticket.getPayload().email);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    const payload: JwtPayload = { user };
+    return { access_token: this.jwtService.sign(payload) };
+  }
+
+  async microsoftLogin(credential: IMicrosoftOAuth): Promise<{ access_token: string }> {
+    if (!credential.accessToken) throw new UnauthorizedException('Invalid credentials');
     const user = await this.usersService.findOneByEmail(credential.email);
     if (!user) throw new UnauthorizedException('Invalid credentials');
     const payload: JwtPayload = { user };
