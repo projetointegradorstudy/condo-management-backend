@@ -7,6 +7,8 @@ import { IAuthService } from './interfaces/auth-service.interface';
 import { IUserService } from 'src/users/interfaces/users-service.interface';
 import { IFacebookOAuth, IGoogleOAuth, IMicrosoftOAuth } from './interfaces/oauts.interface';
 import { OAuth2Client } from 'google-auth-library';
+import { MfaCredentialsDto } from './dto/mfa-credentials.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -14,6 +16,7 @@ export class AuthService implements IAuthService {
   constructor(
     @Inject(forwardRef(() => IUserService)) private readonly usersService: IUserService,
     private jwtService: JwtService,
+    private readonly eventEmitter: EventEmitter2,
   ) {
     this.googleOAuth2 = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_CLIENT_SECRET);
   }
@@ -23,7 +26,19 @@ export class AuthService implements IAuthService {
     if (!user) throw new UnauthorizedException('Invalid credentials');
     if (!(await bcrypt.compare(authCredentialsDto.password, user.password)))
       throw new UnauthorizedException('Invalid credentials');
+    if (user.mfaOption?.email || user.mfaOption?.appAuthenticator) await this.usersService.sendMfaTokenByEmail(user);
     delete user.password;
+    const payload: JwtPayload = { user };
+    return { access_token: this.jwtService.sign(payload) };
+  }
+
+  async mfaTokenValidation(mfaCredentialsDto: MfaCredentialsDto): Promise<{ access_token: string }> {
+    const user = await this.usersService.findToLogin(mfaCredentialsDto.email);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    if (!(await bcrypt.compare(mfaCredentialsDto.token, user.partial_token)))
+      throw new UnauthorizedException('Invalid credentials');
+    delete user.password;
+    this.eventEmitter.emit('clearToken', mfaCredentialsDto.email);
     const payload: JwtPayload = { user };
     return { access_token: this.jwtService.sign(payload) };
   }

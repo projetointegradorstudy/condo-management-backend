@@ -9,10 +9,12 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 import { EnvReservationsModule } from './env-reservations/env-reservations.module';
 import { dataSourceOptions } from './db/data-source';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ validate, isGlobal: true, cache: true }),
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forRoot(dataSourceOptions),
     MailerModule.forRootAsync({
       useFactory: () => ({

@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, MinLength } from 'class-validator';
+import { IsObject, IsOptional, IsString, MinLength, ValidateNested } from 'class-validator';
 import { IsValid } from 'src/decorators/validate.decorator';
+import { Type } from 'class-transformer';
+import { MfaOptionDto } from './mfa-option.dto';
 
 export class UpdateUserDto {
   @ApiProperty({
@@ -30,4 +32,11 @@ export class UpdateUserDto {
   @MinLength(10)
   @IsOptional()
   passwordConfirmation?: string;
+
+  @ApiProperty({ type: MfaOptionDto, required: false, example: new MfaOptionDto() })
+  @ValidateNested()
+  @Type(() => MfaOptionDto)
+  @IsObject()
+  @IsOptional()
+  mfaOption?: MfaOptionDto;
 }

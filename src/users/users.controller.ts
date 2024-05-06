@@ -597,7 +597,7 @@ export class UsersController {
       },
     },
   })
-  @FormData(['avatar', 'name', 'password', 'passwordConfirmation'], false, {
+  @FormData(['avatar', 'name', 'password', 'passwordConfirmation', 'mfaOption'], false, {
     fileFilter: fileMimetypeFilter('png', 'jpg', 'jpeg'),
     limits: { fileSize: 5242880 /** <- 5mb */ },
   })

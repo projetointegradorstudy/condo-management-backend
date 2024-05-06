@@ -12,14 +12,14 @@ export class EmailService implements IEmailService {
     this.host = process.env.BASE_FRONT_URL;
   }
 
-  async sendEmail(userData: AdminCreateUserDto, template: string): Promise<void> {
+  async sendEmail(userData: AdminCreateUserDto, template: string, token?: string): Promise<void> {
     userData.partial_token = userData.partial_token ?? crypto.randomBytes(32).toString('hex');
     const mail = {
       to: userData.email,
       subject: template,
       template: path.resolve(__dirname, '..', '..', '..', `templates/${template}.hbs`),
       context: {
-        token: userData.partial_token,
+        token: token ?? userData.partial_token,
         host: this.host,
       },
       attachments: [

@@ -26,10 +26,15 @@ export class UsersRepository extends BaseRepository<User> implements IUserReposi
         'role',
         'is_active',
         'partial_token',
+        'mfaOption',
         'created_at',
         'updated_at',
         'deleted_at',
       ],
     });
+  }
+
+  async updatePartialToken(email: string, token: string | null): Promise<void> {
+    await this.usersRepository.update({ email }, { partial_token: token });
   }
 }

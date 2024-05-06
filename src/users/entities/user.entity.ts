@@ -15,6 +15,8 @@ import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { Role } from 'src/auth/roles/role.enum';
 import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
+import { IMfaOption } from '../interfaces';
+import { MfaOptionDto } from '../dto/mfa-option.dto';
 
 @Entity()
 export class User extends BaseEntity {
@@ -46,6 +48,10 @@ export class User extends BaseEntity {
   @Column({ default: false })
   is_active: boolean;
 
+  @ApiProperty({ type: 'jsonb', default: new MfaOptionDto() })
+  @Column('jsonb', { name: 'mfa_option', nullable: true, default: new MfaOptionDto() })
+  mfaOption: IMfaOption;
+
   @ApiProperty({ nullable: true })
   @Column({ nullable: true })
   partial_token?: string;
@@ -76,6 +82,7 @@ export class User extends BaseEntity {
       }
     };
     if (this.password) await encrypt('password');
+    if (this.partial_token) await encrypt('partial_token');
   }
 
   constructor(user?: Partial<User>) {

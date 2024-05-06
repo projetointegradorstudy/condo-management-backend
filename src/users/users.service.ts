@@ -12,6 +12,7 @@ import { User } from './entities/user.entity';
 import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 import { IEmailService } from 'src/utils/email/email.interface';
 import { IAuthService } from 'src/auth/interfaces/auth-service.interface';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UsersService implements IUserService {
@@ -112,5 +113,21 @@ export class UsersService implements IUserService {
     if (!user) throw new NotFoundException();
     await this.userRepository.softDelete(id);
     return { message: 'User deleted successfully' };
+  }
+
+  public async sendMfaTokenByEmail(user: User): Promise<void> {
+    const randomToken = await this.generateVerificationCode(user.email);
+    await this.emailService.sendEmail(user, 'Mfa-token', randomToken);
+  }
+
+  private async generateVerificationCode(email: string): Promise<string> {
+    const randomToken = (Math.floor(Math.random() * 900000) + 100000).toString();
+    const user = await this.userRepository.findBy({ where: { email } });
+    await this.userRepository.update({ id: user.id }, { partial_token: randomToken });
+    return randomToken;
+  }
+  @OnEvent('clearToken', { async: true, promisify: true })
+  private async clearPartialToken(email: string) {
+    await this.userRepository.updatePartialToken(email, null);
   }
 }
