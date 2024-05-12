@@ -27,6 +27,7 @@ export class UsersRepository extends BaseRepository<User> implements IUserReposi
         'is_active',
         'partial_token',
         'mfaOption',
+        'twoFactorAuthSecret',
         'created_at',
         'updated_at',
         'deleted_at',

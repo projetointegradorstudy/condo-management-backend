@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Inject, Req } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -75,7 +75,7 @@ export class AuthController {
   }
 
   @Post('mfa-auth')
-  @ApiOperation({ summary: 'Login' })
+  @ApiOperation({ summary: 'Login Mfa' })
   @ApiCreatedResponse({
     description: 'User authenticated successfully',
     schema: {
@@ -128,8 +128,112 @@ export class AuthController {
       },
     },
   })
-  async mfaTokenValidation(@Body() mfaCredentialsDto: MfaCredentialsDto): Promise<any> {
+  async mfaTokenValidation(@Body() mfaCredentialsDto: MfaCredentialsDto): Promise<{ access_token: string }> {
     return this.authService.mfaTokenValidation(mfaCredentialsDto);
+  }
+
+  @Post('2fa-auth')
+  @ApiOperation({ summary: 'Login two factor' })
+  @ApiCreatedResponse({
+    description: 'User authenticated successfully',
+    schema: {
+      type: 'object',
+      properties: {
+        access_token: {
+          type: 'string',
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid credentials',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          default: 401,
+        },
+        message: {
+          type: 'string',
+          default: 'Invalid credentials',
+        },
+        error: {
+          type: 'string',
+          default: 'Unauthorized',
+        },
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'Bad Request',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          default: 400,
+        },
+        message: {
+          type: 'string',
+          default: 'Example error message',
+        },
+        error: {
+          type: 'string',
+          default: 'Bad Request',
+        },
+      },
+    },
+  })
+  async loginWithTwoFactorAuth(@Body() credentials2faDto: MfaCredentialsDto): Promise<{ access_token: string }> {
+    return this.authService.loginWithTwoFactorAuth(credentials2faDto);
+  }
+
+  @Post('2fa-validate')
+  @ApiOperation({ summary: 'Validate code 2fa' })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid credentials',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          default: 401,
+        },
+        message: {
+          type: 'string',
+          default: 'Invalid credentials',
+        },
+        error: {
+          type: 'string',
+          default: 'Unauthorized',
+        },
+      },
+    },
+  })
+  @ApiBadRequestResponse({
+    description: 'Bad Request',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          default: 400,
+        },
+        message: {
+          type: 'string',
+          default: 'Example error message',
+        },
+        error: {
+          type: 'string',
+          default: 'Bad Request',
+        },
+      },
+    },
+  })
+  async twoFactorCodeValidate(@Body() credentials2faDto: MfaCredentialsDto): Promise<boolean> {
+    return this.authService.isTwoFactorAuthCodeValid(credentials2faDto);
   }
 
   @Post('facebook')
