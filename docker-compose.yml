@@ -6,26 +6,26 @@ networks:
     driver: bridge
 
 services:
-  sonarqube:
-    image: sonarqube:9.9.2-community
-    hostname: sonarqube
-    container_name: sonarqube
-    env_file: .env
-    restart: always
-    depends_on:
-      - db-postgres
-    ports:
-      - ${SONAR_PORT}:${SONAR_PORT}
-    environment:
-      sonar.jdbc.url: jdbc:postgresql://db-postgres:${PGSQL_PORT}/${PGSQL_NAME}
-      sonar.jdbc.username: ${SONAR_USER}
-      sonar.jdbc.password: ${SONAR_PASSWORD}
-    volumes:
-      - ./sonarqube/sonarqube_data:/opt/sonarqube/data
-      - ./sonarqube/sonarqube_extensions:/opt/sonarqube/extensions
-      - ./sonarqube/sonarqube_logs:/opt/sonarqube/logs
-    networks:
-      - internal
+  # sonarqube:
+  #   image: sonarqube:9.9.2-community
+  #   hostname: sonarqube
+  #   container_name: sonarqube
+  #   env_file: .env
+  #   restart: always
+  #   depends_on:
+  #     - db-postgres
+  #   ports:
+  #     - ${SONAR_PORT}:${SONAR_PORT}
+  #   environment:
+  #     sonar.jdbc.url: jdbc:postgresql://db-postgres:${PGSQL_PORT}/${PGSQL_NAME}
+  #     sonar.jdbc.username: ${SONAR_USER}
+  #     sonar.jdbc.password: ${SONAR_PASSWORD}
+  #   volumes:
+  #     - ./sonarqube/sonarqube_data:/opt/sonarqube/data
+  #     - ./sonarqube/sonarqube_extensions:/opt/sonarqube/extensions
+  #     - ./sonarqube/sonarqube_logs:/opt/sonarqube/logs
+  #   networks:
+  #     - internal
 
   db-postgres:
     image: postgres:15-alpine3.17

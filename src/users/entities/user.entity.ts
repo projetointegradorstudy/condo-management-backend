@@ -16,7 +16,6 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { Role } from 'src/auth/roles/role.enum';
 import { EnvReservation } from 'src/env-reservations/entities/env-reservation.entity';
 import { IMfaOption } from '../interfaces';
-import { MfaOptionDto } from '../dto/mfa-option.dto';
 
 @Entity()
 export class User extends BaseEntity {
@@ -48,9 +47,13 @@ export class User extends BaseEntity {
   @Column({ default: false })
   is_active: boolean;
 
-  @ApiProperty({ type: 'jsonb', default: new MfaOptionDto() })
-  @Column('jsonb', { name: 'mfa_option', nullable: true, default: new MfaOptionDto() })
+  @ApiProperty({ type: 'jsonb', default: { email: false, appAuthenticator: false } })
+  @Column('jsonb', { name: 'mfa_option', nullable: true, default: { email: false, appAuthenticator: false } })
   mfaOption: IMfaOption;
+
+  @ApiProperty({ nullable: true })
+  @Column({ select: false, name: 'two_factor_auth_secret', nullable: true })
+  twoFactorAuthSecret?: string;
 
   @ApiProperty({ nullable: true })
   @Column({ nullable: true })

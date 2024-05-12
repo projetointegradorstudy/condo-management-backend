@@ -13,6 +13,8 @@ import { EnvReservation } from 'src/env-reservations/entities/env-reservation.en
 import { IEmailService } from 'src/utils/email/email.interface';
 import { IAuthService } from 'src/auth/interfaces/auth-service.interface';
 import { OnEvent } from '@nestjs/event-emitter';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 
 @Injectable()
 export class UsersService implements IUserService {
@@ -79,6 +81,8 @@ export class UsersService implements IUserService {
       const imageUploaded = await this.s3Service.uploadFile(image, user.avatar);
       updateUserDto['avatar'] = imageUploaded.Location;
     }
+    if (!updateUserDto.mfaOption?.appAuthenticator) updateUserDto['twoFactorAuthSecret'] = null;
+
     return await this.userRepository.update({ id }, updateUserDto);
   }
 
@@ -126,6 +130,30 @@ export class UsersService implements IUserService {
     await this.userRepository.update({ id: user.id }, { partial_token: randomToken });
     return randomToken;
   }
+
+  public async turnOnTwoFactorAuth(userId: string): Promise<string> {
+    const user = await this.userRepository.findBy({ where: { id: userId } });
+
+    const { otpAuthUrl, secret } = await this.generateTwoFactorAuthSecret(user);
+    await this.userRepository.update({ id: user.id }, { twoFactorAuthSecret: secret });
+    return await this.generateQrCodeDataURL(otpAuthUrl);
+  }
+
+  private async generateTwoFactorAuthSecret(user: User): Promise<{ secret: string; otpAuthUrl: string }> {
+    const secret = authenticator.generateSecret();
+
+    const otpAuthUrl = authenticator.keyuri(user.email, 'Condo-Management', secret);
+
+    return {
+      secret,
+      otpAuthUrl,
+    };
+  }
+
+  private async generateQrCodeDataURL(otpAuthUrl: string): Promise<string> {
+    return toDataURL(otpAuthUrl);
+  }
+
   @OnEvent('clearToken', { async: true, promisify: true })
   private async clearPartialToken(email: string) {
     await this.userRepository.updatePartialToken(email, null);

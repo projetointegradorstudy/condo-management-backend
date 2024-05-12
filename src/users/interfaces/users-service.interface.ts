@@ -22,6 +22,7 @@ export interface IUserService {
   resetPassword(token: string, resetPasswordDto: ResetPasswordDto): Promise<{ access_token: string }>;
   remove(id: string): Promise<{ message: string }>;
   sendMfaTokenByEmail(user: User): Promise<void>;
+  turnOnTwoFactorAuth(userId: string): Promise<string>;
 }
 
 export const IUserService = Symbol('IUserService');

@@ -9,6 +9,7 @@ import { IFacebookOAuth, IGoogleOAuth, IMicrosoftOAuth } from './interfaces/oaut
 import { OAuth2Client } from 'google-auth-library';
 import { MfaCredentialsDto } from './dto/mfa-credentials.dto';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { authenticator } from 'otplib';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -28,6 +29,7 @@ export class AuthService implements IAuthService {
       throw new UnauthorizedException('Invalid credentials');
     if (user.mfaOption?.email || user.mfaOption?.appAuthenticator) await this.usersService.sendMfaTokenByEmail(user);
     delete user.password;
+    delete user.twoFactorAuthSecret;
     const payload: JwtPayload = { user };
     return { access_token: this.jwtService.sign(payload) };
   }
@@ -38,9 +40,32 @@ export class AuthService implements IAuthService {
     if (!(await bcrypt.compare(mfaCredentialsDto.token, user.partial_token)))
       throw new UnauthorizedException('Invalid credentials');
     delete user.password;
+    delete user.twoFactorAuthSecret;
     this.eventEmitter.emit('clearToken', mfaCredentialsDto.email);
     const payload: JwtPayload = { user };
     return { access_token: this.jwtService.sign(payload) };
+  }
+
+  async loginWithTwoFactorAuth(credentials2faDto: MfaCredentialsDto): Promise<{ access_token: string }> {
+    const user = await this.usersService.findToLogin(credentials2faDto.email);
+    if (!user) throw new UnauthorizedException('Invalid credentials');
+    await this.isTwoFactorAuthCodeValid(credentials2faDto);
+    delete user.password;
+    delete user.twoFactorAuthSecret;
+    const payload: JwtPayload = { user };
+    return { access_token: this.jwtService.sign(payload) };
+  }
+
+  public async isTwoFactorAuthCodeValid(credentials2faDto: MfaCredentialsDto): Promise<boolean> {
+    const user = await this.usersService.findToLogin(credentials2faDto.email);
+    const isCodeValid = authenticator.verify({
+      token: credentials2faDto.token || '',
+      secret: user.twoFactorAuthSecret || '',
+    });
+
+    if (!isCodeValid) throw new UnauthorizedException('Invalid credentials');
+
+    return true;
   }
 
   async facebookLogin(credential: IFacebookOAuth): Promise<{ access_token: string }> {

@@ -606,6 +606,58 @@ export class UsersController {
     return this.usersService.update(req.user.user.id, updateUserDto, image);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth()
+  @Patch('myself/enable-2fa')
+  @ApiOperation({ summary: 'Enable 2FA' })
+  @ApiOkResponse({
+    description: 'Ok response',
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: '2FA enabled successfully',
+        },
+      },
+    },
+  })
+  @ApiUnauthorizedResponse({
+    description: 'Invalid credentials',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          default: 401,
+        },
+        message: {
+          type: 'string',
+          default: 'Unauthorized',
+        },
+      },
+    },
+  })
+  @ApiNotFoundResponse({
+    description: 'User not found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          default: 404,
+        },
+        message: {
+          type: 'string',
+          default: 'Not Found',
+        },
+      },
+    },
+  })
+  update2FaAuth(@Req() req: any) {
+    return this.usersService.turnOnTwoFactorAuth(req.user.user.id);
+  }
+
   @Patch(':token/create-password')
   @ApiOperation({ summary: 'CreatePassword' })
   @ApiOkResponse({
