@@ -27,7 +27,7 @@ export class AuthService implements IAuthService {
     if (!user) throw new UnauthorizedException('Invalid credentials');
     if (!(await bcrypt.compare(authCredentialsDto.password, user.password)))
       throw new UnauthorizedException('Invalid credentials');
-    if (user.mfaOption?.email || user.mfaOption?.appAuthenticator) await this.usersService.sendMfaTokenByEmail(user);
+    if (user.mfaOption?.email) await this.usersService.sendMfaTokenByEmail(user);
     delete user.password;
     delete user.twoFactorAuthSecret;
     const payload: JwtPayload = { user };
